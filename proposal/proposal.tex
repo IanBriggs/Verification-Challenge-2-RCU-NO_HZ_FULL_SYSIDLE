@@ -1,0 +1,41 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{easylist}	
+\usepackage{url}	
+
+\lstset{tabsize=4, numbers=left, language=C}
+
+\graphicspath{ {figures/} }
+
+\begin{document}
+
+\title{Verifying the Update of a Single Integer}
+\author{In Briggs}
+\maketitle
+I am planning to use the Smack tool to formally verify a section of the Linux kernel. This piece of code performs the updates required to determine if all non-housekeeping tasks are completed and thus the CPU can be put to sleep. This is done by a series of cascaded updates which unify to a single variable which counts the number of idle cores, when this number reaches the number of cores on the system it is safe to sleep the CPU.
+
+This is a challenge given to the formal verification community by Paul E. McKenney in his blog\cite{blog.wp}. The challenge was based on a complete failure of the tools he was aware of. He has stated that all these tools not only failed to verify the code or report errors in the code, but most failed to run. In this challenge he has given two spin/promela representations of the algorithm used as well as the code in question. I plan to attempt to meet his challenge, In order to do this I have many tasks set before me.
+
+\begin{enumerate}
+	\item Build a working version of the current stable release of Smack.
+	\item Build a working version of the current bleeding edge Smack.
+	\item Understand how to properly use these version of Smack.
+	\item Understand the Linux code in question
+	\item Understand the Spin based verification of the code given in the blog
+	\item Realize any shortcomings of Smack in relation to weak memory models or parallel verification.
+	\item Fix or work around these shortcomings
+	\item Annotate the kernel code and run Smack on it.
+\end{enumerate}
+
+I have already finished a number of these tasks including building Smack and understanding how to use it as well as understanding the purpose of the code in question.
+
+
+{
+  \bibliographystyle{acm}
+  \bibliography{biblio}
+}
+
+\end{document}
