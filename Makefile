@@ -1,10 +1,23 @@
-
+SMACK_INCLUDE=$(dir `which smackgen.py`)+"../include/smack"
 .PHONY: all
 all: bin/paulmck_pan bin/paulmck_pan
 
 
 .Phony: run
 run: paulmck_spin paulmck_spin
+
+
+
+
+.PHONY: smack_it
+smack_it: gen/smack/sysidle.cor
+	corral gen/smack/sysidle.cor
+
+gen/smack/sysidle.cor: gen/smack/sysidle.bc
+	smackgen.py gen/smack/sysidle.bc -o gen/smack/sysidle.cor
+
+gen/smack/sysidle.bc: src/sysidle/sysidle.c
+	clang -c -Wall -emit-llvm -O0 -g  src/sysidle/sysidle.c -o gen/smack/sysidle.bc
 
 
 
