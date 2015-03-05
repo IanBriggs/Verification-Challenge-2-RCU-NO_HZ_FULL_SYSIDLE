@@ -1,4 +1,5 @@
-SMACK_INCLUDE=$(dir `which smackgen.py`)+"../include/smack"
+SMACK_INCLUDE=$(dir $(shell which smackgen.py))../include/smack
+
 .PHONY: all
 all: bin/paulmck_pan bin/paulmck_pan
 
@@ -10,14 +11,14 @@ run: paulmck_spin paulmck_spin
 
 
 .PHONY: smack_it
-smack_it: gen/smack/sysidle.cor
-	corral gen/smack/sysidle.cor
+smack_it: gen/smack/sysidle.bpl
+	corral gen/smack/sysidle.bpl
 
-gen/smack/sysidle.cor: gen/smack/sysidle.bc
-	smackgen.py gen/smack/sysidle.bc -o gen/smack/sysidle.cor
+gen/smack/sysidle.bpl: gen/smack/sysidle.bc
+	smackgen.py gen/smack/sysidle.bc -o gen/smack/sysidle.bpl
 
 gen/smack/sysidle.bc: src/sysidle/sysidle.c
-	clang -c -Wall -emit-llvm -O0 -g  src/sysidle/sysidle.c -o gen/smack/sysidle.bc
+	clang -c -Wall -emit-llvm -O0 -g -w -I$(SMACK_INCLUDE) src/sysidle/sysidle.c -o gen/smack/sysidle.bc
 
 
 
@@ -58,4 +59,5 @@ gen/mathieu_spin/pan.ltl: src/mathieu_spin/timer_active.ltl
 clean:
 	$(RM) gen/paulmck_spin/*
 	$(RM) gen/mathieu_spin/*
+	$(RM) gen/smack/*
 	$(RM) bin/*

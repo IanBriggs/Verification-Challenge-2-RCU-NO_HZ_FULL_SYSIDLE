@@ -5,6 +5,7 @@
 #include <time.h>
 #include <string.h>
 #include "fake.h"
+#include "smack.h"
 
 #define CONFIG_NR_CPUS 64
 #define NR_CPUS CONFIG_NR_CPUS
