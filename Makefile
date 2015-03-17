@@ -1,11 +1,11 @@
 SMACK_INCLUDE=$(dir $(shell which smackgen.py))../include/smack
 
 .PHONY: all
-all: bin/paulmck_pan bin/paulmck_pan
+all: bin/paulmck_pan bin/mathieu_pan
 
 
 .Phony: run
-run: paulmck_spin paulmck_spin
+run: paulmck_spin mathieu_spin
 
 
 
