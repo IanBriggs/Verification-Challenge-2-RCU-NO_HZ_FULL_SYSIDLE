@@ -5,6 +5,7 @@
 #include <time.h>
 #include <string.h>
 #include "fake_sat.h"
+#include "smack.h"
 
 int __unbuffered_cnt = 0;
 
@@ -104,7 +105,7 @@ void *timekeeping_cpu(void *arg)
 		do_fqs(&rcu_preempt_state, rcu_preempt_data_array);
 		/* do_fqs(&rcu_sched_state, rcu_sched_data_array); */
 	}
-	asm("sync");
+	//asm("sync");
 	__unbuffered_cnt++;
 }
 
@@ -132,7 +133,7 @@ void *other_cpu(void *arg)
 		/* idle exit. */
 		rcu_sysidle_exit(rdtp, 0);
 	}
-	asm("sync");
+	//asm("sync");
 	__unbuffered_cnt++;
 }
 
@@ -174,11 +175,11 @@ int main(int argc, char *argv[])
 
 	/* Stress test. */
 	i = 0;
-	__CPROVER_ASYNC_0: timekeeping_cpu(&ta_array[0]); i++;
-	__CPROVER_ASYNC_1: other_cpu(&ta_array[1]); i++;
-	__CPROVER_ASYNC_2: other_cpu(&ta_array[2]); i++;
-	__CPROVER_ASYNC_3: other_cpu(&ta_array[3]); i++;
-	__CPROVER_assume(__unbuffered_cnt == i);
+	/*__CPROVER_ASYNC_0:*/ timekeeping_cpu(&ta_array[0]); i++;
+	/*__CPROVER_ASYNC_1:*/ other_cpu(&ta_array[1]); i++;
+	/*__CPROVER_ASYNC_2:*/ other_cpu(&ta_array[2]); i++;
+	/*__CPROVER_ASYNC_3:*/ other_cpu(&ta_array[3]); i++;
+	/*__CPROVER_assume(__unbuffered_cnt == i);*/
 	assert(full_sysidle_state != RCU_SYSIDLE_FULL_NOTED ||
 	       (atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
 	       (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0 &&

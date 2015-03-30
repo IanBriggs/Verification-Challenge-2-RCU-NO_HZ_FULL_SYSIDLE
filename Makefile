@@ -21,6 +21,17 @@ gen/smack/sysidle.bc: src/sysidle/sysidle.c
 	clang -c -Wall -emit-llvm -O0 -g -w -I$(SMACK_INCLUDE) src/sysidle/sysidle.c -o gen/smack/sysidle.bc
 
 
+.PHONY: smack_sat_it
+smack_sat_it: gen/smack/sysidle_sat.bpl
+	corral gen/smack/sysidle_sat.bpl
+
+gen/smack/sysidle_sat.bpl: gen/smack/sysidle_sat.bc
+	smackgen.py gen/smack/sysidle_sat.bc -o gen/smack/sysidle_sat.bpl
+
+gen/smack/sysidle_sat.bc: src/sysidle/sysidle_sat.c
+	clang -c -Wall -emit-llvm -O0 -g -w -I$(SMACK_INCLUDE) src/sysidle/sysidle_sat.c -o gen/smack/sysidle_sat.bc
+
+
 
 
 .PHONY: paulmck_spin
