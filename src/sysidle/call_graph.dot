@@ -2,7 +2,7 @@ digraph {
 
 
 // standard c calls
-{ node [shape=box style=filled fillcolor=yellow]
+{ node [shape=octagon style=filled fillcolor=yellow]
     malloc
     sizeof
     memset
@@ -24,7 +24,7 @@ digraph {
 }
 
 // kernel programming calls
-{ node [shape=oval style=filled fillcolor=blue]
+{ node [shape=octagon style=filled fillcolor=blue]
     ACCESS_ONCE
     WARN_ON_ONCE
     ULONG_CMP_LT
@@ -32,14 +32,23 @@ digraph {
     DIV_ROUND_UP
 }
 
-// testing code calls
+// sysidle.c
 { node [shape=oval style=filled fillcolor=orange]
     main
     timekeeping_cpu
     other_cpu
     do_fqs
     rcu_kick_nohz_cpu
+    rcu_gp_in_progress
 }
+
+// fake.h
+{ node [shape=box style=filled fillcolor=orange]
+    per_cpu_ptr
+    call_rcu
+    cpu_is_offline
+    smp_processor_id
+ }
 
 // sysidle (proper) calls
 { node [shape=oval style=filled fillcolor=green]
@@ -56,13 +65,13 @@ digraph {
 
 // assembly/gcc builtin calls
 { node [shape=oval style=filled fillcolor=red]
-   smp_mb
-   xchg
-   cmpxchg
-   smp_mb__before_atomic_inc
-   atomic_inc 
-   smp_mb__after_atomic_inc
-   atomic_read
+    cmpxchg
+    smp_mb__before_atomic_inc
+    atomic_inc 
+    smp_mb__after_atomic_inc
+    atomic_read
+    smp_mb
+    xchg
 }
 
 // sysidle.c
@@ -110,6 +119,5 @@ rcu_sysidle_report -> {rcu_sysidle rcu_sysidle_cancel}
 rcu_sys_is_idle -> {ACCESS_ONCE WARN_ON_ONCE smp_processor_id per_cpu_ptr 
                     rcu_sysidle_check_cpu rcu_sysidle_report cmpxchg smp_mb
                     rcu_gp_in_progress xchg call_rcu}
-
 
 }
