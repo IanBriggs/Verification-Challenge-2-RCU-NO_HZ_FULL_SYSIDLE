@@ -52,7 +52,8 @@ if __name__ == "__main__":
     with open(command_file, 'r') as f:
         commands = f.read()
     commands = commands.splitlines()
-    commands = list(map(lambda line: list(line.split()), commands))
+    commands = [list(line.split()) for line in commands if line.strip() != '']
+
 
     # queue them up
     for command in commands:
