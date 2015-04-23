@@ -10,9 +10,6 @@ command_file = "commands.txt"
 # the output filename
 filename = "command_output.txt"
 
-# the number of seconds between command line progress updates
-step = 10
-
 # label printing details
 print_width = 80
 divider = "+{}+\n".format('-'*(print_width-2))
@@ -20,13 +17,12 @@ center = "| {{:{}}} |\n".format(print_width-4)
 label = divider+center+divider+'\n'
 vspace = '\n'*10
 
-import time as t
 import multiprocessing as mp
 import subprocess as sp
 import sys
 
 
-def Run_Command(write_lock, progress, work_queue):
+def Run_Command(write_lock, progress, work_queue, child_conn):
     while(not work_queue.empty()):
         # get the next prime
         next_command = work_queue.get()
@@ -41,9 +37,9 @@ def Run_Command(write_lock, progress, work_queue):
             f.write(label.format(" ".join(next_command)))
             f.write(text.decode("utf-8"))
             f.write(vspace)
+            progress.value += 1
+            child_conn.send(progress.value)
         write_lock.release()
-        
-        progress.value += 1
 
 
 if __name__ == "__main__":
@@ -72,9 +68,12 @@ if __name__ == "__main__":
 
     # make the lock for writing
     write_lock = mp.Lock()
+
+    # pipe for status updates
+    parent_conn, child_conn = Pipe()
     
     # make a list of all the processes to be ran
-    process_list = [mp.Process(target=Run_Command, args=(write_lock, progress, work_queue)) for i in range(count)]
+    process_list = [mp.Process(target=Run_Command, args=(write_lock, progress, work_queue, child_conn)) for i in range(count)]
 
     print("Using {} processes".format(count))
 
@@ -84,9 +83,9 @@ if __name__ == "__main__":
         
 	# print to standard out the current number of commands processed
     while(not work_queue.empty()):
-        sys.stdout.write("Finished with {} out of {}\r".format(progress.value, work_amount))
+        update = parent_conn.recv()
+        sys.stdout.write("Finished with {} out of {}\r".format(update, work_amount))
         sys.stdout.flush()
-        t.sleep(step)
     
     # output final status update
     sys.stdout.write("Finished with {} out of {}\n".format(work_amount, work_amount))
