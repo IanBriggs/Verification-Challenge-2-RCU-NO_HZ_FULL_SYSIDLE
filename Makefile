@@ -1,4 +1,4 @@
-SMACK_INCLUDE=$(dir $(shell which smackgen.py))../include/smack
+SMACK_INCLUDE=/home/vagrant/smack/share/smack/include/
 
 .PHONY: all
 all: bin/paulmck_pan bin/mathieu_pan
@@ -12,24 +12,24 @@ run: paulmck_spin mathieu_spin
 
 .PHONY: smack_it
 smack_it: gen/smack/sysidle.bpl
-	corral gen/smack/sysidle.bpl
+	corral /recursionBound:512 /k:128 /trackAllVars  gen/smack/sysidle.bpl
 
 gen/smack/sysidle.bpl: gen/smack/sysidle.bc
-	smackgen.py gen/smack/sysidle.bc -o gen/smack/sysidle.bpl
+	smackgen.py --mem-mod no-reuse-impls gen/smack/sysidle.bc -o gen/smack/sysidle.bpl
 
 gen/smack/sysidle.bc: src/sysidle/sysidle.c
-	clang -c -Wall -emit-llvm -O0 -g -w -I$(SMACK_INCLUDE) src/sysidle/sysidle.c -o gen/smack/sysidle.bc
+	clang -c -Wall -emit-llvm -O0 -g -w -DMEMORY_MODEL_NO_REUSE_IMPLS -I$(SMACK_INCLUDE) src/sysidle/sysidle.c -o gen/smack/sysidle.bc
 
 
 .PHONY: smack_sat_it
 smack_sat_it: gen/smack/sysidle_sat.bpl
-	corral gen/smack/sysidle_sat.bpl
+	corral /recursionBound:512 /k:128 /trackAllVars gen/smack/sysidle_sat.bpl
 
 gen/smack/sysidle_sat.bpl: gen/smack/sysidle_sat.bc
-	smackgen.py gen/smack/sysidle_sat.bc -o gen/smack/sysidle_sat.bpl
+	smackgen.py --mem-mod no-reuse-impls gen/smack/sysidle_sat.bc -o gen/smack/sysidle_sat.bpl
 
 gen/smack/sysidle_sat.bc: src/sysidle/sysidle_sat.c
-	clang -c -Wall -emit-llvm -O0 -g -w -I$(SMACK_INCLUDE) src/sysidle/sysidle_sat.c -o gen/smack/sysidle_sat.bc
+	clang -c -Wall -emit-llvm -O0 -g -w -DMEMORY_MODEL_NO_REUSE_IMPLS -I$(SMACK_INCLUDE) src/sysidle/sysidle_sat.c -o gen/smack/sysidle_sat.bc
 
 
 

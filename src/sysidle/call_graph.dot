@@ -1,0 +1,115 @@
+digraph {
+
+
+// standard c calls
+{ node [shape=box style=filled fillcolor=yellow]
+    malloc
+    sizeof
+    memset
+    srand
+    time 
+    printf
+    sleep
+    abort
+    printf
+    random
+    poll
+}
+
+// pthread calls
+{ node [shape=octagon style=filled fillcolor=deeppink]
+    pthread_create
+    pthread_join
+    perror
+}
+
+// kernel programming calls
+{ node [shape=oval style=filled fillcolor=blue]
+    ACCESS_ONCE
+    WARN_ON_ONCE
+    ULONG_CMP_LT
+    ULONG_CMP_GE
+    DIV_ROUND_UP
+}
+
+// testing code calls
+{ node [shape=oval style=filled fillcolor=orange]
+    main
+    timekeeping_cpu
+    other_cpu
+    do_fqs
+    rcu_kick_nohz_cpu
+}
+
+// sysidle (proper) calls
+{ node [shape=oval style=filled fillcolor=green]
+    rcu_sys_is_idle
+    rcu_sysidle_check_cpu
+    rcu_sysidle_report
+    rcu_sysidle_enter
+    rcu_sysidle_exit
+    rcu_sysidle_force_exit
+    rcu_sysidle
+    rcu_sysidle_cancel
+    rcu_sysidle_delay
+}
+
+// assembly/gcc builtin calls
+{ node [shape=oval style=filled fillcolor=red]
+   smp_mb
+   xchg
+   cmpxchg
+   smp_mb__before_atomic_inc
+   atomic_inc 
+   smp_mb__after_atomic_inc
+   atomic_read
+}
+
+// sysidle.c
+main -> {malloc sizeof memset srand time printf pthread_create sleep ACCESS_ONCE
+         pthread_join perror abort printf}
+
+pthread_create -> {timekeeping_cpu other_cpu}
+
+timekeeping_cpu -> {ACCESS_ONCE do_fqs}
+
+other_cpu -> {ACCESS_ONCE WARN_ON_ONCE poll rcu_sysidle_enter random 
+              rcu_sysidle_exit}
+
+do_fqs -> {random poll rcu_sysidle_check_cpu ACCESS_ONCE rcu_sysidle_report 
+           printf rcu_sys_is_idle }
+
+
+// sysidle.h
+rcu_sysidle_enter -> {WARN_ON_ONCE smp_mb__before_atomic_inc atomic_inc 
+                      smp_mb__after_atomic_inc}
+
+rcu_sysidle_force_exit -> {ACCESS_ONCE cmpxchg rcu_kick_nohz_cpu smp_mb}
+
+rcu_sysidle_exit -> {WARN_ON_ONCE smp_mb__before_atomic_inc atomic_inc 
+                      smp_mb__after_atomic_inc atomic_read smp_processor_id
+                      rcu_sysidle_force_exit}
+
+rcu_sysidle_check_cpu -> {cpu_is_offline WARN_ON_ONCE smp_processor_id 
+		          atomic_read smp_mb ACCESS_ONCE ULONG_CMP_LT}
+
+
+
+
+rcu_sysidle_delay -> {DIV_ROUND_UP}
+
+rcu_sysidle -> {ACCESS_ONCE ULONG_CMP_GE rcu_sysidle_delay cmpxchg}
+
+rcu_sysidle_cancel -> {smp_mb ACCESS_ONCE}
+
+rcu_sysidle_report -> {rcu_sysidle rcu_sysidle_cancel}
+
+
+
+
+rcu_sys_is_idle -> {ACCESS_ONCE WARN_ON_ONCE smp_processor_id per_cpu_ptr 
+                    rcu_sysidle_check_cpu rcu_sysidle_report cmpxchg smp_mb
+                    rcu_gp_in_progress xchg call_rcu}
+
+
+}

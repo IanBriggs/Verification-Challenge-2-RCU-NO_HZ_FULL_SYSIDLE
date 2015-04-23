@@ -154,11 +154,11 @@ int main(int argc, char *argv[])
 	pthread_t *tids;
 
 	/* Parse single optional argument, # cpus. */
-	if (argc > 1) {
+	/*	if (argc > 1) {
 		nr_cpu_ids = atoi(argv[1]);
 		nthreads = nr_cpu_ids;
 		printf("nr_cpu_ids set to %d\n", nr_cpu_ids);
-	}
+		}*/
 
 	/* Allocate arrays and initialize. */
 	rcu_preempt_data_array =
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 	srandom(time(NULL));
 
 	/* Smoke test. */
-	printf("Start smoke test.\n");
+	/*	printf("Start smoke test.\n");
 	for (i = 1; i < nthreads; i++) {
 		my_smp_processor_id = i;
 		rcu_sysidle_enter(&rcu_dynticks_array[i], 0);
@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
 		my_smp_processor_id = i;
 		rcu_sysidle_exit(&rcu_dynticks_array[i], 0);
 	}
-	printf("End of smoke test.\n");
+	printf("End of smoke test.\n");*/
 
 	/* Stress test. */
 	printf("Start stress test.\n");
