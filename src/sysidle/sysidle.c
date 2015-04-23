@@ -5,7 +5,10 @@
 #include <time.h>
 #include <string.h>
 #include "fake.h"
+
+#include <unistd.h>
 #include "smack.h"
+
 
 #define CONFIG_NR_CPUS 64
 #define NR_CPUS CONFIG_NR_CPUS
@@ -46,7 +49,7 @@ static int rcu_gp_in_progress(struct rcu_state *rsp)
 #include "sysidle.h"
 
 int goflag = 1;
-int nthreads = 8;
+int nthreads = 4;
 
 struct thread_arg {
 	int me;
@@ -214,10 +217,17 @@ int main(int argc, char *argv[])
 
 	/* Stress test. */
 	printf("Start stress test.\n");
-	pthread_create(&tids[0], NULL, timekeeping_cpu, &ta_array[0]);
+	/*pthread_create(&tids[0], NULL, timekeeping_cpu, &ta_array[0]);
 	for (i = 1; i < nthreads; i++) {
 		pthread_create(&tids[i], NULL, other_cpu, &ta_array[i]);
-	}
+		}*/
+
+	timekeeping_cpu(&ta_array[0]);
+	other_cpu(&ta_array[1]);
+	other_cpu(&ta_array[2]);
+	other_cpu(&ta_array[3]);
+
+	
 	sleep(10);
 	ACCESS_ONCE(goflag) = 0;
 	for (i = 0; i < nthreads; i++) {
@@ -228,5 +238,10 @@ int main(int argc, char *argv[])
 			abort();
 		}
 	}
+
+	assert(full_sysidle_state != RCU_SYSIDLE_FULL_NOTED ||
+	       (atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
+	       (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0 &&
+	       (atomic_read(&rcu_preempt_data_array[3].dynticks->dynticks_idle) & 0x1) == 0);
 	printf("End of stress test.\n");
 }

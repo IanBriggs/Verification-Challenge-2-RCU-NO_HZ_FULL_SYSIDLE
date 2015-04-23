@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+#include <poll.h>
+
 /* 32-bit build. */
 
 typedef signed char s8;

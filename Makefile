@@ -11,14 +11,13 @@ run: paulmck_spin mathieu_spin
 
 
 .PHONY: smack_it
-smack_it: gen/smack/sysidle.bpl
-	corral /recursionBound:512 /k:128 /trackAllVars  gen/smack/sysidle.bpl
+smack_it: 
+	smackverify.py -o gen/smack/sysidle.bpl --bc gen/smack/sysidle.bc src/sysidle/sysidle.c
 
-gen/smack/sysidle.bpl: gen/smack/sysidle.bc
-	smackgen.py --mem-mod no-reuse-impls gen/smack/sysidle.bc -o gen/smack/sysidle.bpl
+.PHONY: redo
+redo:
+	corral /trackAllVars /recursionBound:10 gen/smack/sysidle.bpl
 
-gen/smack/sysidle.bc: src/sysidle/sysidle.c
-	clang -c -Wall -emit-llvm -O0 -g -w -DMEMORY_MODEL_NO_REUSE_IMPLS -I$(SMACK_INCLUDE) src/sysidle/sysidle.c -o gen/smack/sysidle.bc
 
 
 .PHONY: smack_sat_it
