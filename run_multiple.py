@@ -82,13 +82,13 @@ if __name__ == "__main__":
         pro.start()
         
 	# print to standard out the current number of commands processed
-    while(not work_queue.empty()):
+    while(progress.value < work_amount):
         update = parent_conn.recv()
         sys.stdout.write("Finished with {} out of {}\r".format(update, work_amount))
         sys.stdout.flush()
     
     # output final status update
-    sys.stdout.write("Finished with {} out of {}\n".format(work_amount, work_amount))
+    sys.stdout.write("Finished with {} out of {}\n".format(update, work_amount))
 
     # make sure we don't leave stragglers
     print("cleaning up")
