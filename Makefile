@@ -1,4 +1,3 @@
-SMACK_INCLUDE=/home/vagrant/smack/share/smack/include/
 
 .PHONY: all
 all: bin/paulmck_pan bin/mathieu_pan
@@ -12,24 +11,11 @@ run: paulmck_spin mathieu_spin
 
 .PHONY: smack_it
 smack_it: 
-	smackverify.py -o gen/smack/sysidle.bpl --bc gen/smack/sysidle.bc src/sysidle/sysidle.c
+	smackverify.py -o=gen/smack/sysidle.bpl --bc=gen/smack/sysidle.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/sysidle/sysidle.c 
 
 .PHONY: redo
 redo:
-	corral /trackAllVars /recursionBound:10 gen/smack/sysidle.bpl
-
-
-
-.PHONY: smack_sat_it
-smack_sat_it: gen/smack/sysidle_sat.bpl
-	corral /recursionBound:512 /k:128 /trackAllVars gen/smack/sysidle_sat.bpl
-
-gen/smack/sysidle_sat.bpl: gen/smack/sysidle_sat.bc
-	smackgen.py --mem-mod no-reuse-impls gen/smack/sysidle_sat.bc -o gen/smack/sysidle_sat.bpl
-
-gen/smack/sysidle_sat.bc: src/sysidle/sysidle_sat.c
-	clang -c -Wall -emit-llvm -O0 -g -w -DMEMORY_MODEL_NO_REUSE_IMPLS -I$(SMACK_INCLUDE) src/sysidle/sysidle_sat.c -o gen/smack/sysidle_sat.bc
-
+	corral /trackAllVars /recursionBound:4 gen/smack/sysidle.bpl
 
 
 
