@@ -49,6 +49,10 @@ redo:
 
 # injected bugs
 
+.PHONY: smoke
+smoke:
+	smackverify.py -o=gen/smack_bug/smoke.bpl --bc=gen/smack_bug/smoke.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/smoke/sysidle.c 
+
 .PHONY: smack_bug_0
 smack_bug_0:
 	smackverify.py -o=gen/smack_bug/sysidle_bug_0.bpl --bc=gen/smack_bug/sysidle_bug_0.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/sysidle_bug_0/sysidle.c 
