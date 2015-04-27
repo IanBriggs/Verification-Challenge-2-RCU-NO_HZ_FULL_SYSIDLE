@@ -12,8 +12,19 @@ run: paulmck_spin mathieu_spin
 
 
 .PHONY: test
-test:
-	smackverify.py -o=gen/test/atomic_inc.bpl --bc=gen/test/atomic_inc.bc --verifier=corral --verifier-options="/trackAllVars" src/atomic_inc/atomic_inc.c
+test: cmpxchg
+
+
+.PHONY: cmpxchg
+cmpxchg:
+	smackverify.py -o=gen/test/cmpxchg.bpl --bc=gen/test/cmpxchg.bc --verifier=corral --verifier-options="/trackAllVars" test/cmpxchg.c
+
+.PHONY: atomic_inc
+atomic_inc:
+	smackverify.py -o=gen/test/atomic_inc.bpl --bc=gen/test/atomic_inc.bc --verifier=corral --verifier-options="/trackAllVars" test/atomic_inc.c
+
+
+
 
 
 .PHONY: smack_it

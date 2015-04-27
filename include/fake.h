@@ -181,8 +181,16 @@ extern void __add_wrong_size(void)
 #include "cmpxchg_32.h"
 
 #ifdef __HAVE_ARCH_CMPXCHG
+/* using smack stomic */
 #define cmpxchg(ptr, old, new)						\
-	__cmpxchg(ptr, old, new, sizeof(*(ptr)))
+({                                                                      \
+        __SMACK_code("call corral_atomic_begin();");                    \
+	__typeof__(*(ptr)) __ret;					\
+	__ret = *ptr;                                                   \
+	if (__ret == old) {*ptr = new;}                                 \
+	__SMACK_code("call corral_atomic_end();");                      \
+	__ret;                                                          \
+})
 
 #define sync_cmpxchg(ptr, old, new)					\
 	__sync_cmpxchg(ptr, old, new, sizeof(*(ptr)))
