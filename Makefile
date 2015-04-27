@@ -12,8 +12,12 @@ run: paulmck_spin mathieu_spin
 
 
 .PHONY: test
-test: cmpxchg
+test: atomic_read
 
+
+.PHONY: atomic_read
+atomic_read:
+	smackverify.py -o=gen/test/atomic_read.bpl --bc=gen/test/atomic_read.bc --verifier=corral --verifier-options="/trackAllVars" test/atomic_read.c
 
 .PHONY: cmpxchg
 cmpxchg:
@@ -76,3 +80,4 @@ clean:
 	$(RM) gen/smack/*
 	$(RM) gen/test/*
 	$(RM) bin/*
+	$(RM) *.bc
