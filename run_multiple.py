@@ -70,7 +70,7 @@ if __name__ == "__main__":
     write_lock = mp.Lock()
 
     # pipe for status updates
-    parent_conn, child_conn = Pipe()
+    parent_conn, child_conn = mp.Pipe()
     
     # make a list of all the processes to be ran
     process_list = [mp.Process(target=Run_Command, args=(write_lock, progress, work_queue, child_conn)) for i in range(count)]
