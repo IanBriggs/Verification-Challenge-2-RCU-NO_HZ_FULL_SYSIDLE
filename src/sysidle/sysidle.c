@@ -8,6 +8,8 @@
 #include <string.h>
 #include "fake.h"
 
+#include <unistd.h>
+
 #define CONFIG_NR_CPUS 64
 #define NR_CPUS CONFIG_NR_CPUS
 #define CONFIG_RCU_FANOUT 16

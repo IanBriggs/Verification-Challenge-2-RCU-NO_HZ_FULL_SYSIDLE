@@ -102,6 +102,7 @@ gen/mathieu_spin/pan.ltl: src/mathieu_spin/timer_active.ltl
 clean:
 	$(RM) gen/paulmck_spin/*
 	$(RM) gen/mathieu_spin/*
+	$(RM) gen/smack_bug/*
 	$(RM) gen/smack/*
 	$(RM) gen/test/*
 	$(RM) bin/*
