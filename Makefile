@@ -11,6 +11,9 @@ run: paulmck_spin mathieu_spin
 
 
 
+
+# make sure smack can understand called functions
+
 .PHONY: test
 test: xchg
 
@@ -33,7 +36,7 @@ atomic_inc:
 
 
 
-
+# original code
 
 .PHONY: smack_it
 smack_it: 
@@ -44,6 +47,21 @@ redo:
 	corral /trackAllVars /recursionBound:4 gen/smack/sysidle.bpl
 
 
+# injected bugs
+
+.PHONY: smack_bug_0
+smack_bug_0:
+	smackverify.py -o=gen/smack_bug/sysidle_bug_0.bpl --bc=gen/smack_bug/sysidle_bug_0.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/sysidle_bug_0/sysidle.c 
+
+.PHONY: smack_bug_1
+smack_bug_1:
+	smackverify.py -o=gen/smack_bug/sysidle_bug_1.bpl --bc=gen/smack_bug/sysidle_bug_1.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/sysidle_bug_1/sysidle.c 
+
+
+
+
+
+# spin models given with the challenge
 
 .PHONY: paulmck_spin
 paulmck_spin: bin/paulmck_pan
@@ -76,6 +94,9 @@ gen/mathieu_spin/pan.ltl: src/mathieu_spin/timer_active.ltl
 
 
 
+
+
+# remove generated files etc
 
 .PHONY: clean
 clean:
