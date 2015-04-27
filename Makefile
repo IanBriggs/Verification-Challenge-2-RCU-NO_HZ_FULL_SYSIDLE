@@ -1,3 +1,6 @@
+current_dir = $(shell pwd)
+C_INCLUDE_PATH=$(current_dir)/include:/home/vagrant/smack/share/smack/include/
+
 
 .PHONY: all
 all: bin/paulmck_pan bin/mathieu_pan
@@ -7,6 +10,10 @@ all: bin/paulmck_pan bin/mathieu_pan
 run: paulmck_spin mathieu_spin
 
 
+
+.PHONY: test
+test:
+	smackverify.py -o=gen/test/atomic_inc.bpl --bc=gen/test/atomic_inc.bc --verifier=corral --verifier-options="/trackAllVars" src/atomic_inc/atomic_inc.c
 
 
 .PHONY: smack_it
@@ -56,4 +63,5 @@ clean:
 	$(RM) gen/paulmck_spin/*
 	$(RM) gen/mathieu_spin/*
 	$(RM) gen/smack/*
+	$(RM) gen/test/*
 	$(RM) bin/*
