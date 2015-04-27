@@ -12,8 +12,12 @@ run: paulmck_spin mathieu_spin
 
 
 .PHONY: test
-test: atomic_read
+test: xchg
 
+
+.PHONY: xchg
+xchg:
+	smackverify.py -o=gen/test/xchg.bpl --bc=gen/test/xchg.bc --verifier=corral --verifier-options="/trackAllVars" test/xchg.c
 
 .PHONY: atomic_read
 atomic_read:

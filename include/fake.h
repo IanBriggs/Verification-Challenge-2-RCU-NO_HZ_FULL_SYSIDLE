@@ -114,7 +114,16 @@ extern void __add_wrong_size(void)
  * use "asm volatile" and "memory" clobbers to prevent gcc from moving
  * information around.
  */
-#define xchg(ptr, v)	__xchg_op((ptr), (v), xchg, "")
+/* smack atomic used */
+#define xchg(ptr, v)                                                   \
+({                                                                     \
+  __SMACK_code("call corral_atomic_begin();");			       \
+  __typeof__ (*(ptr)) __ret;					       \
+  __ret = *ptr;                                                        \
+  *ptr = v;                                                            \
+  __SMACK_code("call corral_atomic_end();");			       \
+  __ret;                                                               \
+})
 
 /*
  * Atomic compare and exchange.  Compare OLD with MEM, if identical,
