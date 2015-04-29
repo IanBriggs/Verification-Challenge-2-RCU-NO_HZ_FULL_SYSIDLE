@@ -1,0 +1,5 @@
+verifiers: [corral]
+memory: [no-reuse, no-reuse-impls, reuse]
+time-limit: 300
+flags: [ "--verifier-options=/k:1 /trackAllVars" , --unroll=1]
+skip: false

@@ -2,6 +2,7 @@
 
 #include "fake.h"
 
+// @expect verified
 
 int
 main(int argc, char ** argv)
@@ -21,12 +22,4 @@ main(int argc, char ** argv)
   b = cmpxchg(&a, 1, 10);
   assert(b == 1);
   assert(a == 10);
-
-  b = cmpxchg(&a, 10, 1);
-  assert(b == 10);
-
-  /* This _should_ fail, no others */
-  int line_to_properly_fail_on = 30;
-  assert(a == 10);
-
 }

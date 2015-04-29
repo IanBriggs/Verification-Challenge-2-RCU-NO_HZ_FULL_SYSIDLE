@@ -12,7 +12,7 @@ all:
 
 .PHONY: test
 test:
-	cd test && ./regtest.py
+	cd test && ./regtest.py --exhaustive
 
 
 # original code
@@ -46,6 +46,8 @@ clean:
 	$(RM) gen/injected_bugs/*
 	$(RM) gen/smoke_tests/
 	$(RM) gen/original/*
+	$(RM) test/*.bc
+	$(RM) test/*.bpl
 	$(RM) test/*/*.bc
 	$(RM) test/*/*.bpl
 	$(RM) *.bc
