@@ -28,6 +28,18 @@ smack_it:
 smoke:
 	smackverify.py -o=gen/smoke/smoke.bpl --bc=gen/smoke/smoke.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/smoke/sysidle_sat.c 
 
+.PHONY: sysidle_bug_0
+sysidle_bug_0:
+	smackverify.py -o=gen/smack_bug/sysidle_bug_0.bpl --bc=gen/smack_bug/sysidle_bug_0.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/sysidle_bug_0/sysidle_sat.c 
+
+.PHONY: sysidle_bug_1
+sysidle_bug_1:
+	smackverify.py -o=gen/smack_bug/sysidle_bug_1.bpl --bc=gen/smack_bug/sysidle_bug_1.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/sysidle_bug_1/sysidle_sat.c 
+
+.PHONY: sysidle_bug_2
+sysidle_bug_2:
+	smackverify.py -o=gen/smack_bug/sysidle_bug_2.bpl --bc=gen/smack_bug/sysidle_bug_2.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/sysidle_bug_2/sysidle_sat.c 
+
 
 # remove generated files etc
 
