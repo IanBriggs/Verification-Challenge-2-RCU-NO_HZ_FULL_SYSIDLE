@@ -19,33 +19,22 @@ test:
 
 .PHONY: smack_it
 smack_it: 
-	smackverify.py -o=gen/smack/sysidle.bpl --bc=gen/smack/sysidle.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/sysidle/sysidle.c 
+	smackverify.py -o=gen/smack/sysidle_sat.bpl --bc=gen/smack/sysidle_sat.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/sysidle/sysidle_sat.c 
 
 
 # injected bugs
 
 .PHONY: smoke
 smoke:
-	smackverify.py -o=gen/smack_bug/smoke.bpl --bc=gen/smack_bug/smoke.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/smoke/sysidle.c 
-
-.PHONY: smack_bug_0
-smack_bug_0:
-	smackverify.py -o=gen/smack_bug/sysidle_bug_0.bpl --bc=gen/smack_bug/sysidle_bug_0.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/sysidle_bug_0/sysidle.c 
-
-.PHONY: smack_bug_1
-smack_bug_1:
-	smackverify.py -o=gen/smack_bug/sysidle_bug_1.bpl --bc=gen/smack_bug/sysidle_bug_1.bc --unroll=4 --verifier=corral  --verifier-options="/trackAllVars" src/sysidle_bug_1/sysidle.c 
-
-
+	smackverify.py -o=gen/smoke/smoke.bpl --bc=gen/smoke/smoke.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/smoke/sysidle_sat.c 
 
 
 # remove generated files etc
 
 .PHONY: clean
 clean:
-	$(RM) gen/injected_bugs/*
-	$(RM) gen/smoke_tests/
-	$(RM) gen/original/*
+	$(RM) gen/*/*.bpl
+	$(RM) gen/*/*.bc
 	$(RM) test/*.bc
 	$(RM) test/*.bpl
 	$(RM) test/*/*.bc

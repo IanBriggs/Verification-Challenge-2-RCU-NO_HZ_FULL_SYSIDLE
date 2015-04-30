@@ -1,6 +1,6 @@
 #include <pthread.h>
 
-#include "fake.h"
+#include "fake_sat.h"
 
 // @expect error
 
