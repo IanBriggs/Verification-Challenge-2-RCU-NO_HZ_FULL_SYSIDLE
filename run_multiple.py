@@ -4,91 +4,199 @@
 #
 # Keep a large machine always churning
 
-# the input filename
-command_file = "commands.txt"
-
-# the output filename
-filename = "command_output.txt"
-
-# label printing details
-print_width = 80
-divider = "+{}+\n".format('-'*(print_width-2))
-center = "| {{:{}}} |\n".format(print_width-4)
-label = divider+center+divider+'\n'
-vspace = '\n'*10
-
-import multiprocessing as mp
-import subprocess as sp
+import multiprocessing as MP
+import subprocess as SP
+import argparse as AP
+import time as T
 import sys
+import os
+
+def parse_args():
+    desc = "Schedule long running jobs in a batch-style fashion"
+    epi =  "Commands are run in subdiretories of the output directory"         \
+           ".stout and stderr of the command are put "                         \
+           "into a \"command_output.txt\" file in the subdirectories"
+    parser = AP.ArgumentParser(description=desc, epilog=epi)
+    parser.add_argument("-p", metavar="procs", type=int, default=None,
+                        help="number of concurrent jobs to run, "
+                        "default is the number of cores")
+    parser.add_argument("command_file", type=str,
+                        help="file with list of commands to run")
+    parser.add_argument("-o", metavar="output_dir", type=str, default="gen",
+                        help="directory to put output subdirectories into, "
+                        "default is \"gen\"")
+    args = parser.parse_args()
+    
+    count = args.p
+
+    if (count == None):
+        # figure the number of cores and queue up that many processes
+        # this may throw an error, is so catch it and assume one cpu core
+        try:
+            count = MP.cpu_count()
+        except ValueError:
+            count = 1
+
+    return {"procs" : count, 
+            "output_dir" : args.o,
+            "command_file" : args.command_file}
 
 
-def Run_Command(write_lock, progress, work_queue, child_conn):
-    while(not work_queue.empty()):
-        # get the next prime
-        next_command = work_queue.get()
-
-        # get output
-        with sp.Popen(next_command, stdout=sp.PIPE) as proc:
-            text = proc.stdout.read()
-
-        # uses the lock to stop interleaving lines
-        write_lock.acquire()
-        with open(filename, 'a') as f:
-            f.write(label.format(" ".join(next_command)))
-            f.write(text.decode("utf-8"))
-            f.write(vspace)
-            progress.value += 1
-            child_conn.send(progress.value)
-        write_lock.release()
+def progress_made(static_arg_lock=MP.Lock(), static_arg=[-1]):
+    static_arg_lock.acquire()
+    static_arg[0] += 1
+    static_arg_lock.release()
+    return static_arg[0]
 
 
-if __name__ == "__main__":
+def next_dir_number(static_arg_lock=MP.Lock(), static_arg=[-1]):
+    static_arg_lock.acquire()
+    static_arg[0] += 1
+    static_arg_lock.release()
+    return static_arg[0]
+
+
+def expand_abs_path(text):
+    if (os.path.isfile(text) or os.path.isdir(text)):
+        return os.path.abspath(text)
+    return text
+
+
+def generate_work_queue(command_file):
     # make the list of commands
-    work_queue = mp.Queue()
-    with open(command_file, 'r') as f:
-        commands = f.read()
+    try:
+        with open(command_file, 'r') as f:
+            commands = f.read()
+    except:
+        print("Error: Can't to read \"{}\"".format(command_file))
+        sys.exit()
+        
+    # split out commands
     commands = commands.splitlines()
-    commands = [list(line.split()) for line in commands if line.strip() != '']
+    commands = [command for command in commands if command.strip() != '']
+    commands = [list(command.split()) for command in commands]
 
+    # expand to absolute path names
+    commands = [[expand_abs_path(part)for part in command] 
+                for command in commands]
 
     # queue them up
+    work_queue = MP.Queue()
     for command in commands:
         work_queue.put(command)
-    work_amount = len(commands)
+    
+    return work_queue
 
-    # figure the number of cores and queue up that many processes
-    # this may throw an error, is so catch it and assume one cpu core
+
+def mkdir(new_dir):
+    if os.path.isfile(new_dir):
+        return False
+    if os.path.isdir(new_dir):
+        return True
     try:
-        count = mp.cpu_count()
-    except ValueError:
-        count = 1
+        os.mkdir(new_dir)
+        return True
+    except:
+        return False
+    
 
-    # used to hold the number of commands processed
-    progress = mp.Value('i',0)
+def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
+        # get the next command
+        next_command = work_queue.get()
 
-    # make the lock for writing
-    write_lock = mp.Lock()
+        # get to base
+        os.chdir(output_dir)
+        
+        # get new subdir based on atomic incrmeent
+        dirnum_lock.acquire()
+        new_subdir = "command_{}".format(dirnum.value)
+        dirnum.value += 1
+        dirnum_lock.release()
+
+        # make and move to new subdir
+        mkdir(new_subdir)
+        os.chdir(new_subdir)
+
+        # run
+        start = T.time()
+        with SP.Popen(next_command, stdout=SP.PIPE, stderr=SP.STDOUT) as proc:
+            text = proc.stdout.read()
+        end = T.time()
+
+        # put output in file
+        with open("command_output.txt", 'w') as f:
+            f.write("command run: {}\n".format(' '.join(next_command)))
+            f.write("time elapsed: {} seconds\n\n\n".format(end-start))
+            f.write(text.decode("utf-8"))
+
+        
+
+def process_worker(progress_lock, progress,dirnum_lock, dirnum, 
+                   work_queue, child_conn, output_dir):
+    while(not work_queue.empty()):
+        # run the command
+        run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir)
+
+        # incrament progress value
+        progress_lock.acquire()
+        progress.value += 1
+        # ping main process to update progress display
+        child_conn.send("data here doesn't matter")
+        progress_lock.release()
+        
+
+
+
+
+def main():
+    # parse args and display number of procs used
+    arg_dict = parse_args()
+    print("Using {} concurrent processes".format(arg_dict["procs"]))
+
+    # generate work queue
+    work_queue = generate_work_queue(arg_dict["command_file"])
+    work_amount = work_queue.qsize()
+    print("{} commands to execute".format(work_amount))
+
+    # make/check output dir
+    if (not mkdir(arg_dict["output_dir"])):
+        print("Error: unable to make/read output directory")
+        sys.exit()
+    arg_dict["output_dir"] = os.path.abspath(arg_dict["output_dir"])
 
     # pipe for status updates
-    parent_conn, child_conn = mp.Pipe()
+    parent_conn, child_conn = MP.Pipe()
+
+    # preogress var
+    progress_lock = MP.Lock()
+    progress = MP.Value('i', 0)
+
+    # make process list
+    arguments = (progress_lock, progress,     # progress made
+                 MP.Lock(), MP.Value('i', 0), # output directory number
+                 work_queue, child_conn,      # work communication
+                 arg_dict["output_dir"])      # directory to work from
+    process_list = [MP.Process(target=process_worker, args=arguments)
+                    for i in range(arg_dict["procs"])]
     
-    # make a list of all the processes to be ran
-    process_list = [mp.Process(target=Run_Command, args=(write_lock, progress, work_queue, child_conn)) for i in range(count)]
-
-    print("Using {} processes".format(count))
-
     # start running
     for pro in process_list:
         pro.start()
-        
-	# print to standard out the current number of commands processed
+
+    # first output regardless
+    sys.stdout.write("Finished with {} out of {}\r".format(0, work_amount))
+
+    # print to stdout the current number of commands processed
     while(progress.value < work_amount):
-        update = parent_conn.recv()
-        sys.stdout.write("Finished with {} out of {}\r".format(update, work_amount))
+        parent_conn.recv() # wait on recv
+        progress_lock.acquire()
+        sys.stdout.write("Finished with {} out of {}\r".format(progress.value,
+                                                               work_amount))
+        progress_lock.release()
         sys.stdout.flush()
-    
-    # output final status update
-    sys.stdout.write("Finished with {} out of {}\n".format(update, work_amount))
+
+    # final output so next print doesn't overwite progress info
+    print("Finished with {} out of {}".format(progress.value, work_amount))
 
     # make sure we don't leave stragglers
     print("cleaning up")
@@ -96,3 +204,7 @@ if __name__ == "__main__":
         pro.join()
 
     print("Done!")
+
+
+if __name__ == "__main__":
+    main()
