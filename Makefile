@@ -1,10 +1,13 @@
-current_dir = $(shell pwd)
-C_INCLUDE_PATH=$(current_dir)/include:/home/vagrant/smack/share/smack/include/
+SMACK_INCLUDE_PATH=$(HOME)/smack/share/smack/include
 
+C_INCLUDE_PATH=$(CURDIR)/include:$(SMACK_INCLUDE_PATH)
+
+SMACK_ARGS = --unroll=6 --verifier=corral --verifier-options="/trackAllVars /v:2 /k:2"
+SMACK = smackverify.py $(SMACK_ARGS)
 
 .PHONY: all
 all: 
-	echo "Chose one specifically to run"
+	echo "Runs take a long time, choose one explicitly"
 
 
 
@@ -17,28 +20,29 @@ test:
 
 # original code
 
-.PHONY: smack_it
-smack_it: 
-	smackverify.py -o=gen/smack/sysidle_sat.bpl --bc=gen/smack/sysidle_sat.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/sysidle/sysidle_sat.c 
+.PHONY: sysidle_sat
+sysidle_sat: 
+	cd gen && mkdir sysidle_sat && $(SMACK) $(CURDIR)src/sysidle_sat/sysidle_sat.c 
 
 
 # injected bugs
 
-.PHONY: smoke
-smoke:
-	smackverify.py -o=gen/smoke/smoke.bpl --bc=gen/smoke/smoke.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/smoke/sysidle_sat.c 
+.PHONY: sysidle_sat_smoke_0
+sysidle_sat_smoke_0:
+	cd gen && mkdir sysidle_sat_smoke_0 && $(SMACK) $(CURDIR)src/sysidle_sat_smoke_0/sysidle_sat.c 
 
-.PHONY: sysidle_bug_0
-sysidle_bug_0:
-	smackverify.py -o=gen/smack_bug/sysidle_bug_0.bpl --bc=gen/smack_bug/sysidle_bug_0.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/sysidle_bug_0/sysidle_sat.c 
+.PHONY: sysidle_sat_bug_0
+sysidle_sat_bug_0:
+	cd gen && mkdir sysidle_sat_bug_0 && $(SMACK) $(CURDIR)src/sysidle_sat_bug_0/sysidle_sat.c 
 
-.PHONY: sysidle_bug_1
-sysidle_bug_1:
-	smackverify.py -o=gen/smack_bug/sysidle_bug_1.bpl --bc=gen/smack_bug/sysidle_bug_1.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/sysidle_bug_1/sysidle_sat.c 
+.PHONY: sysidle_sat_bug_1
+sysidle_sat_bug_1:
+	cd gen && mkdir sysidle_sat_bug_1 && $(SMACK) $(CURDIR)src/sysidle_sat_bug_1/sysidle_sat.c 
 
-.PHONY: sysidle_bug_2
-sysidle_bug_2:
-	smackverify.py -o=gen/smack_bug/sysidle_bug_2.bpl --bc=gen/smack_bug/sysidle_bug_2.bc --unroll=6 --verifier=corral  --verifier-options="/trackAllVars /k:1" src/sysidle_bug_2/sysidle_sat.c 
+.PHONY: sysidle_sat_bug_2
+sysidle_sat_bug_2:
+	cd gen && mkdir sysidle_sat_bug_2 && $(SMACK) $(CURDIR)src/sysidle_sat_bug_2/sysidle_sat.c 
+
 
 
 # remove generated files etc
