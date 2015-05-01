@@ -1,62 +1,57 @@
-corral /trackAllVars /recursionBound:6 /k:1 gen/smack/sysidle.bpl
-corral /trackAllVars /recursionBound:7 /k:1 gen/smack/sysidle.bpl
-corral /trackAllVars /recursionBound:8 /k:1 gen/smack/sysidle.bpl
-corral /trackAllVars /recursionBound:9 /k:1 gen/smack/sysidle.bpl
-corral /trackAllVars /recursionBound:10 /k:1 gen/smack/sysidle.bpl
+corral /trackAllVars /recursionBound:6 /k:1 gen/smack/sysidle_sat.bpl
+corral /trackAllVars /recursionBound:7 /k:1 gen/smack/sysidle_sat.bpl
+corral /trackAllVars /recursionBound:8 /k:1 gen/smack/sysidle_sat.bpl
+corral /trackAllVars /recursionBound:9 /k:1 gen/smack/sysidle_sat.bpl
+corral /trackAllVars /recursionBound:10 /k:1 gen/smack/sysidle_sat.bpl
 
-corral /trackAllVars /recursionBound:6 /k:2 gen/smack/sysidle.bpl
-corral /trackAllVars /recursionBound:6 /k:3 gen/smack/sysidle.bpl
-corral /trackAllVars /recursionBound:6 /k:4 gen/smack/sysidle.bpl
-corral /trackAllVars /recursionBound:6 /k:5 gen/smack/sysidle.bpl
+corral /trackAllVars /recursionBound:6 /k:1 gen/smack_bug/sysidle_sat_bug_0.bpl
+corral /trackAllVars /recursionBound:7 /k:1 gen/smack_bug/sysidle_sat_bug_0.bpl
+corral /trackAllVars /recursionBound:8 /k:1 gen/smack_bug/sysidle_sat_bug_0.bpl
+corral /trackAllVars /recursionBound:9 /k:1 gen/smack_bug/sysidle_sat_bug_0.bpl
+corral /trackAllVars /recursionBound:10 /k:1 gen/smack_bug/sysidle_sat_bug_0.bpl
 
+corral /trackAllVars /recursionBound:6 /k:1 gen/smack_bug/sysidle_sat_bug_1.bpl
+corral /trackAllVars /recursionBound:7 /k:1 gen/smack_bug/sysidle_sat_bug_1.bpl
+corral /trackAllVars /recursionBound:8 /k:1 gen/smack_bug/sysidle_sat_bug_1.bpl
+corral /trackAllVars /recursionBound:9 /k:1 gen/smack_bug/sysidle_sat_bug_1.bpl
+corral /trackAllVars /recursionBound:10 /k:1 gen/smack_bug/sysidle_sat_bug_1.bpl
 
+corral /trackAllVars /recursionBound:6 /k:1 gen/smack_bug/sysidle_sat_bug_2.bpl
+corral /trackAllVars /recursionBound:7 /k:1 gen/smack_bug/sysidle_sat_bug_2.bpl
+corral /trackAllVars /recursionBound:8 /k:1 gen/smack_bug/sysidle_sat_bug_2.bpl
+corral /trackAllVars /recursionBound:9 /k:1 gen/smack_bug/sysidle_sat_bug_2.bpl
+corral /trackAllVars /recursionBound:10 /k:1 gen/smack_bug/sysidle_sat_bug_2.bpl
 
-corral /trackAllVars /recursionBound:6 /k:1 gen/smack_bug/sysidle_bug_0.bpl
-corral /trackAllVars /recursionBound:7 /k:1 gen/smack_bug/sysidle_bug_0.bpl
-corral /trackAllVars /recursionBound:8 /k:1 gen/smack_bug/sysidle_bug_0.bpl
-corral /trackAllVars /recursionBound:9 /k:1 gen/smack_bug/sysidle_bug_0.bpl
-corral /trackAllVars /recursionBound:10 /k:1 gen/smack_bug/sysidle_bug_0.bpl
-
-corral /trackAllVars /recursionBound:6 /k:2 gen/smack_bug/sysidle_bug_0.bpl
-corral /trackAllVars /recursionBound:6 /k:3 gen/smack_bug/sysidle_bug_0.bpl
-corral /trackAllVars /recursionBound:6 /k:4 gen/smack_bug/sysidle_bug_0.bpl
-corral /trackAllVars /recursionBound:6 /k:5 gen/smack_bug/sysidle_bug_0.bpl
-
-
-
-
-corral /trackAllVars /recursionBound:6 /k:1 gen/smack_bug/sysidle_bug_1.bpl
-corral /trackAllVars /recursionBound:7 /k:1 gen/smack_bug/sysidle_bug_1.bpl
-corral /trackAllVars /recursionBound:8 /k:1 gen/smack_bug/sysidle_bug_1.bpl
-corral /trackAllVars /recursionBound:9 /k:1 gen/smack_bug/sysidle_bug_1.bpl
-corral /trackAllVars /recursionBound:10 /k:1 gen/smack_bug/sysidle_bug_1.bpl
-
-corral /trackAllVars /recursionBound:6 /k:2 gen/smack_bug/sysidle_bug_1.bpl
-corral /trackAllVars /recursionBound:6 /k:3 gen/smack_bug/sysidle_bug_1.bpl
-corral /trackAllVars /recursionBound:6 /k:4 gen/smack_bug/sysidle_bug_1.bpl
-corral /trackAllVars /recursionBound:6 /k:5 gen/smack_bug/sysidle_bug_1.bpl
-
-
-corral /trackAllVars /recursionBound:6 /k:1 gen/smack_bug/sysidle_bug_2.bpl
-corral /trackAllVars /recursionBound:7 /k:1 gen/smack_bug/sysidle_bug_2.bpl
-corral /trackAllVars /recursionBound:8 /k:1 gen/smack_bug/sysidle_bug_2.bpl
-corral /trackAllVars /recursionBound:9 /k:1 gen/smack_bug/sysidle_bug_2.bpl
-corral /trackAllVars /recursionBound:10 /k:1 gen/smack_bug/sysidle_bug_2.bpl
-
-corral /trackAllVars /recursionBound:6 /k:2 gen/smack_bug/sysidle_bug_2.bpl
-corral /trackAllVars /recursionBound:6 /k:3 gen/smack_bug/sysidle_bug_2.bpl
-corral /trackAllVars /recursionBound:6 /k:4 gen/smack_bug/sysidle_bug_2.bpl
-corral /trackAllVars /recursionBound:6 /k:5 gen/smack_bug/sysidle_bug_2.bpl
+corral /trackAllVars /recursionBound:6 /k:1 gen/smoke/smoke.bpl
+corral /trackAllVars /recursionBound:7 /k:1 gen/smoke/smoke.bpl
+corral /trackAllVars /recursionBound:8 /k:1 gen/smoke/smoke.bpl
+corral /trackAllVars /recursionBound:9 /k:1 gen/smoke/smoke.bpl
+corral /trackAllVars /recursionBound:10 /k:1 gen/smoke/smoke.bpl
 
 
 
-corral /trackAllVars /recursionBound:6 /k:1 gen/smack_bug/smoke.bpl
-corral /trackAllVars /recursionBound:7 /k:1 gen/smack_bug/smoke.bpl
-corral /trackAllVars /recursionBound:8 /k:1 gen/smack_bug/smoke.bpl
-corral /trackAllVars /recursionBound:9 /k:1 gen/smack_bug/smoke.bpl
-corral /trackAllVars /recursionBound:10 /k:1 gen/smack_bug/smoke.bpl
 
-corral /trackAllVars /recursionBound:6 /k:2 gen/smack_bug/smoke.bpl
-corral /trackAllVars /recursionBound:6 /k:3 gen/smack_bug/smoke.bpl
-corral /trackAllVars /recursionBound:6 /k:4 gen/smack_bug/smoke.bpl
-corral /trackAllVars /recursionBound:6 /k:5 gen/smack_bug/smoke.bpl
+
+corral /trackAllVars /recursionBound:6 /k:2 gen/smack/sysidle_sat.bpl
+corral /trackAllVars /recursionBound:6 /k:2 gen/smack_bug/sysidle_sat_bug_0.bpl
+corral /trackAllVars /recursionBound:6 /k:2 gen/smack_bug/sysidle_sat_bug_1.bpl
+corral /trackAllVars /recursionBound:6 /k:2 gen/smack_bug/sysidle_sat_bug_2.bpl
+corral /trackAllVars /recursionBound:6 /k:2 gen/smoke/smoke.bpl
+
+corral /trackAllVars /recursionBound:6 /k:3 gen/smack/sysidle_sat.bpl
+corral /trackAllVars /recursionBound:6 /k:3 gen/smack_bug/sysidle_sat_bug_0.bpl
+corral /trackAllVars /recursionBound:6 /k:3 gen/smack_bug/sysidle_sat_bug_1.bpl
+corral /trackAllVars /recursionBound:6 /k:3 gen/smack_bug/sysidle_sat_bug_2.bpl
+corral /trackAllVars /recursionBound:6 /k:3 gen/smoke/smoke.bpl
+
+corral /trackAllVars /recursionBound:6 /k:4 gen/smack/sysidle_sat.bpl
+corral /trackAllVars /recursionBound:6 /k:4 gen/smack_bug/sysidle_sat_bug_0.bpl
+corral /trackAllVars /recursionBound:6 /k:4 gen/smack_bug/sysidle_sat_bug_1.bpl
+corral /trackAllVars /recursionBound:6 /k:4 gen/smack_bug/sysidle_sat_bug_2.bpl
+corral /trackAllVars /recursionBound:6 /k:4 gen/smoke/smoke.bpl
+
+corral /trackAllVars /recursionBound:6 /k:5 gen/smack/sysidle_sat.bpl
+corral /trackAllVars /recursionBound:6 /k:5 gen/smack_bug/sysidle_sat_bug_0.bpl
+corral /trackAllVars /recursionBound:6 /k:5 gen/smack_bug/sysidle_sat_bug_1.bpl
+corral /trackAllVars /recursionBound:6 /k:5 gen/smack_bug/sysidle_sat_bug_2.bpl
+corral /trackAllVars /recursionBound:6 /k:5 gen/smoke/smoke.bpl
