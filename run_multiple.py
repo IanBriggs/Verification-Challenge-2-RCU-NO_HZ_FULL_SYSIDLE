@@ -55,11 +55,16 @@ def next_dir_number(static_arg_lock=MP.Lock(), static_arg=[-1]):
     static_arg_lock.release()
     return static_arg[0]
 
-
-def expand_abs_path(text):
+def expand_path(text)
     if (os.path.isfile(text) or os.path.isdir(text)):
         return os.path.abspath(text)
     return text
+
+def command_string_to_list(command):
+    command_list = command.split()
+    command_list = [item for item in command_list if item.strip() != '']
+    command_list = map(expand_path, command_list)
+    return command_list
 
 
 def generate_work_queue(command_file):
@@ -74,11 +79,7 @@ def generate_work_queue(command_file):
     # split out commands
     commands = commands.splitlines()
     commands = [command for command in commands if command.strip() != '']
-    commands = [list(command.split(' ')) for command in commands]
-
-    # expand to absolute path names
-    commands = [[expand_abs_path(part)for part in command] 
-                for command in commands]
+    commands = map(command_string_to_list, commands)
 
     # queue them up
     work_queue = MP.Queue()
