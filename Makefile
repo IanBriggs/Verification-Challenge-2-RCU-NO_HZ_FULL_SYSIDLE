@@ -57,8 +57,7 @@ sysidle_smoke_0:
 
 .PHONY: clean
 clean:
-	$(RM) gen/*/*.bpl
-	$(RM) gen/*/*.bc
+	$(RM) -r gen/*
 	$(RM) test/*.bc
 	$(RM) test/*.bpl
 	$(RM) test/*/*.bc

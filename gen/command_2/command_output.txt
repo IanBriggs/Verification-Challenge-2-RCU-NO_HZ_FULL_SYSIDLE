@@ -1,0 +1,13 @@
+command run: smackverify.py --unroll=10 --verifier=corral --verifier-options=/trackAllVars --verifier-options=/v:2 --verifier-options=/k:1 /users/ibriggs/Verification-Challenge-2-RCU-NO_HZ_FULL_SYSIDLE/src/sysidle_sat_bug_0/sysidle_sat.c
+time elapsed: 3625.536112308502 seconds
+
+
+Verifying program while tracking: {}
+Program has a potential bug: False bug
+Verifying program while tracking: {$M.11}
+Program has a potential bug: False bug
+Verifying program while tracking: {$M.11, $M.6}
+
+Error, internal bug: Z3 ran out of resources
+
+SMACK encountered an error when invoking corral. Exiting...

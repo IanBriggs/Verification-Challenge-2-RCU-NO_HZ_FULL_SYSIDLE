@@ -74,7 +74,7 @@ def generate_work_queue(command_file):
     # split out commands
     commands = commands.splitlines()
     commands = [command for command in commands if command.strip() != '']
-    commands = [list(command.split()) for command in commands]
+    commands = [list(command.split(' ')) for command in commands]
 
     # expand to absolute path names
     commands = [[expand_abs_path(part)for part in command] 

@@ -1,0 +1,9 @@
+command run: smackverify.py --unroll=10 --verifier=corral  --verifier-options=/trackAllVars --verifier-options=/v:2 --verifier-options=/k:2 /users/ibriggs/Verification-Challenge-2-RCU-NO_HZ_FULL_SYSIDLE/src/sysidle_smoke_0/sysidle.c
+time elapsed: 0.09598398208618164 seconds
+
+
+usage: smackverify.py [-v] [-o <file>] [-d]
+                      [--mem-mod {no-reuse,no-reuse-impls,reuse}]
+                      [--bit-precise] [--no-byte-access-inference]
+                      <file>
+smackverify.py: error: the file  does not exist!
