@@ -45,11 +45,14 @@ typedef _Bool                   bool;
  * use "asm volatile" and "memory" clobbers to prevent gcc from moving
  * information around.
  */
-#define xchg(ptr, v)	                                                        \
-({                                                                              \
-	__typeof__(*(ptr)) __old = *ptr;                                        \
-	*ptr = v;                                                               \
-	__old;	          							\
+// SMACK code
+#define xchg(ptr, v)							\
+({									\
+  __SMACK_code("call corral_atomic_begin();");				\
+  __typeof__(*(ptr)) __old = *ptr;					\
+  *ptr = v;								\
+  __SMACK_code("call corral_atomic_end();");				\
+  __old;								\
 })
 
 /*
@@ -74,8 +77,10 @@ typedef _Bool                   bool;
 // #ifdef __HAVE_ARCH_CMPXCHG
 #define cmpxchg(ptr, old, new)						\
 ({									\
+  __SMACK_code("call corral_atomic_begin();");				\
   __typeof__(*(ptr)) __old = *ptr;					\
   if (__old == old) {*ptr = new;}					\
+  __SMACK_code("call corral_atomic_end();");				\
   __old;								\
 })
 

@@ -87,8 +87,10 @@ static inline int atomic_sub_and_test(int i, atomic_t *v)
  */
 static inline void atomic_inc(atomic_t *v)
 {
-  //atomic_add(1, v);
+  // SMACK code
+  __SMACK_code("call corral_atomic_begin();");
   v->counter = v->counter + 1;
+  __SMACK_code("call corral_atomic_end();");
 }
 
 /**
