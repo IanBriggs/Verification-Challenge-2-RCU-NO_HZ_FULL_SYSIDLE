@@ -54,7 +54,7 @@ digraph {
 
 
 // sysidle.h
-{ node [shape=box style=filled fillcolor=indigo]
+{ node [shape=box style=filled fillcolor=violet]
   rcu_sysidle_enter
   rcu_sysidle_force_exit
   rcu_sysidle_exit
