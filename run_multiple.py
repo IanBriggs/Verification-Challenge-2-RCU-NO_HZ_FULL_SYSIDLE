@@ -11,6 +11,8 @@ import time as T
 import sys
 import os
 
+from pprint import pprint
+
 def parse_args():
     desc = "Schedule long running jobs in a batch-style fashion"
     epi =  "Commands are run in subdiretories of the output directory"         \
@@ -42,29 +44,14 @@ def parse_args():
             "command_file" : args.command_file}
 
 
-def progress_made(static_arg_lock=MP.Lock(), static_arg=[-1]):
-    static_arg_lock.acquire()
-    static_arg[0] += 1
-    static_arg_lock.release()
-    return static_arg[0]
-
-
-def next_dir_number(static_arg_lock=MP.Lock(), static_arg=[-1]):
-    static_arg_lock.acquire()
-    static_arg[0] += 1
-    static_arg_lock.release()
-    return static_arg[0]
-
-def expand_path(text)
+def expand_path(text):
     if (os.path.isfile(text) or os.path.isdir(text)):
         return os.path.abspath(text)
     return text
 
-def command_string_to_list(command):
-    command_list = command.split()
-    command_list = [item for item in command_list if item.strip() != '']
-    command_list = map(expand_path, command_list)
-    return command_list
+def command_expand(command_list):
+    command_list = list(map(expand_path, command_list))
+    return ' '.join(command_list)
 
 
 def generate_work_queue(command_file):
@@ -78,8 +65,8 @@ def generate_work_queue(command_file):
         
     # split out commands
     commands = commands.splitlines()
-    commands = [command for command in commands if command.strip() != '']
-    commands = map(command_string_to_list, commands)
+    commands = [command.split(" ") for command in commands if command.strip() != '']
+    commands = list(map(command_expand, commands))
 
     # queue them up
     work_queue = MP.Queue()
@@ -120,13 +107,13 @@ def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
 
         # run
         start = T.time()
-        with SP.Popen(next_command, stdout=SP.PIPE, stderr=SP.STDOUT) as proc:
+        with SP.Popen(next_command, stdout=SP.PIPE, stderr=SP.STDOUT, shell=True) as proc:
             text = proc.stdout.read()
         end = T.time()
 
         # put output in file
         with open("command_output.txt", 'w') as f:
-            f.write("command run: {}\n".format(' '.join(next_command)))
+            f.write("command run: {}\n".format(next_command))
             f.write("time elapsed: {} seconds\n\n\n".format(end-start))
             f.write(text.decode("utf-8"))
 
