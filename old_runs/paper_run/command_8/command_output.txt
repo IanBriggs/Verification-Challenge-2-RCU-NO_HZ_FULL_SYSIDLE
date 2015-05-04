@@ -1,0 +1,53 @@
+command run: smackverify.py --unroll=5 --verifier=corral --verifier-options="/trackAllVars /v:2 /k:1" /users/ibriggs/Verification-Challenge-2-RCU-NO_HZ_FULL_SYSIDLE/src/sysidle/sysidle.c
+time elapsed: 2383.0639839172363 seconds
+
+
+Verifying program while tracking: {$CurrAddr, $M.2, $M.3, $M.4, $M.5, $M.6, $M.7, $M.8, $M.9, $M.10, $M.11, $M.0, $M.14, $M.15, $M.16, $M.22, $pthreadStatus, $M.40, $M.37, $M.35, $M.36, $M.39}
+>> SI: Size of VC after eager inlining: 6981
+>> SI Inlining: $static_init $init_funcs $alloca $malloc llvm.memset.p0i8.i64.r0 $malloc llvm.memset.p0i8.i64.r0 $malloc llvm.memset.p0i8.i64.r0 $malloc llvm.memset.p0i8.i64.r0 $malloc main_loop_$bb4 pthread_create main_loop_$bb7 main_loop_$bb10 atomic_read atomic_read __SMACK_dummy atomic_read atomic_read 
+>> SI Skipping: 
+>> SI Inlining: __SMACK_init_func_corral_primitives __SMACK_init_func_thread __SMACK_nondet __SMACK_nondet __SMACK_dummy __call_wrapper 
+>> SI Skipping: 
+>> SI Inlining: __SMACK_nondet __SMACK_dummy timekeeping_cpu 
+>> SI Skipping: 
+>> SI Inlining: timekeeping_cpu_loop_$bb1 
+>> SI Skipping: 
+>> SI Inlining: do_fqs 
+>> SI Skipping: 
+>> SI Inlining: $alloca $alloca do_fqs_loop_$bb1 rcu_sysidle_report 
+>> SI Skipping: 
+>> SI Inlining: rcu_sysidle 
+>> SI Skipping: 
+>> SI Inlining: rcu_sys_is_idle 
+>> SI Skipping: 
+>> SI Inlining: $alloca $alloca rcu_sys_is_idle_loop_$bb9 
+>> SI Skipping: 
+>> SI Inlining: rcu_sys_is_idle_loop_$bb14 rcu_sysidle_check_cpu rcu_sysidle_report 
+>> SI Skipping: 
+>> SI Inlining: rcu_sysidle 
+>> SI Skipping: 
+>> SI: Exhausted Bound 1
+>> SI Inlining: atomic_set atomic_set main_loop_$bb4 pthread_create main_loop_$bb7 pthread_join main_loop_$bb10 
+>> SI Skipping: 
+>> SI Inlining: do_fqs do_fqs timekeeping_cpu_loop_$bb1 
+>> SI Skipping: 
+>> SI Inlining: $alloca $alloca do_fqs_loop_$bb1 rcu_sysidle_report rcu_sys_is_idle $alloca $alloca do_fqs_loop_$bb1 rcu_sysidle_report rcu_sys_is_idle 
+>> SI Skipping: 
+>> SI Inlining: rcu_sysidle $alloca $alloca rcu_sys_is_idle_loop_$bb9 $alloca $alloca rcu_sys_is_idle_loop_$bb9 
+>> SI Skipping: 
+>> SI Inlining: rcu_sys_is_idle_loop_$bb14 rcu_sysidle_check_cpu rcu_sysidle_report rcu_sys_is_idle_loop_$bb9 
+>> SI Skipping: 
+>> SI Inlining: rcu_sysidle 
+>> SI Skipping: 
+>> SI Inlining: rcu_sysidle_delay rcu_sys_is_idle_loop_$bb14 rcu_sysidle_check_cpu rcu_sysidle_report rcu_sys_is_idle_loop_$bb9 
+>> SI Skipping: 
+>> SI Inlining: rcu_sys_is_idle_loop_$bb14 rcu_sysidle_check_cpu rcu_sysidle_report rcu_sys_is_idle_loop_$bb9 
+>> SI Skipping: 
+>> SI: Expansions performed: 86
+>> SI: Candidates left: 89
+>> SI: Candidates skipped: 0
+>> SI: VC Size: 74856
+
+Error, internal bug: Z3 ran out of resources
+
+SMACK encountered an error when invoking corral. Exiting...
