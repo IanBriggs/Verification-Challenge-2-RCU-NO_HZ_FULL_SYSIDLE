@@ -1,5 +1,5 @@
 verifiers: [corral]
-memory: [no-reuse, no-reuse-impls, reuse]
+memory: [no-reuse-impls, no-reuse, reuse]
 time-limit: 300
-flags: [ "--verifier-options=/k:1", --unroll=1]
+flags: [ '--pthread' ]
 skip: false
