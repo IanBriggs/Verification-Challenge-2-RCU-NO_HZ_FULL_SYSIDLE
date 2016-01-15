@@ -1,5 +1,0 @@
-verifiers: [corral]
-memory: [no-reuse-impls, no-reuse, reuse]
-time-limit: 14400
-flags: [ '--pthread' ]
-skip: false
