@@ -1,9 +1,7 @@
-SMACK_INCLUDE_PATH=$(HOME)/smack/share/smack/include
+export C_INCLUDE_PATH := $(CURDIR)/include:$(C_INCLUDE_PATH)
 
-export C_INCLUDE_PATH=$(CURDIR)/include:$(SMACK_INCLUDE_PATH)
-
-SMACK_ARGS = --unroll=10 --verifier=corral --verifier-options="/trackAllVars /v:2 /k:1"
-SMACK = smackverify.py $(SMACK_ARGS)
+SMACK_ARGS = --time-limit=3600 --pthread --loop-limit=10 --unroll=10 --verifier=corral --context-bound=2 --verifier-options="/trackAllVars /v:2"
+SMACK = smack $(SMACK_ARGS)
 
 .PHONY: all
 all: 
@@ -22,35 +20,22 @@ test:
 
 .PHONY: sysidle_sat
 sysidle_sat: 
-	mkdir -p gen/susidle_sat && cd gen/sysidle_sat && $(SMACK) $(CURDIR)/src/sysidle_sat/sysidle_sat.c 
+	mkdir -p gen/sysidle_sat && cd gen/sysidle_sat && $(SMACK) $(CURDIR)/src/sysidle_sat.c 
 
 .PHONY: sysidle
 sysidle: 
-	mkdir -p gen/sysidle && cd gen/sysidle && $(SMACK) $(CURDIR)/src/sysidle/sysidle.c 
+	mkdir -p gen/sysidle && cd gen/sysidle && $(SMACK) $(CURDIR)/src/sysidle.c 
 
 
 # injected bugs
 
-.PHONY: sysidle_sat_smoke_0
-sysidle_sat_smoke_0:
-	cd gen && mkdir sysidle_sat_smoke_0 && $(SMACK) $(CURDIR)/src/sysidle_sat_smoke_0/sysidle_sat.c 
+.PHONY: sysidle_smoke
+sysidle_smoke: 
+	mkdir -p gen/sysidle_smoke && cd gen/sysidle_smoke && $(SMACK) $(CURDIR)/src/sysidle_smoke.c
 
-.PHONY: sysidle_sat_bug_0
-sysidle_sat_bug_0:
-	cd gen && mkdir sysidle_sat_bug_0 && $(SMACK) $(CURDIR)/src/sysidle_sat_bug_0/sysidle_sat.c 
-
-.PHONY: sysidle_sat_bug_1
-sysidle_sat_bug_1:
-	cd gen && mkdir sysidle_sat_bug_1 && $(SMACK) $(CURDIR)/src/sysidle_sat_bug_1/sysidle_sat.c 
-
-.PHONY: sysidle_sat_bug_2
-sysidle_sat_bug_2:
-	cd gen && mkdir sysidle_sat_bug_2 && $(SMACK) $(CURDIR)/src/sysidle_sat_bug_2/sysidle_sat.c 
-
-
-.PHONY: sysidle_smoke_0
-sysidle_smoke_0: 
-	mkdir -p gen/sysidle_smoke_0 && cd gen/sysidle_smoke_0 && $(SMACK) $(CURDIR)/src/sysidle_smoke_0/sysidle.c 
+.PHONY: sysidle_sat_smoke
+sysidle_sat_smoke: 
+	mkdir -p gen/sysidle_sat_smoke && cd gen/sysidle_sat_smoke && $(SMACK) $(CURDIR)/src/sysidle_sat_smoke.c 
 
 
 # remove generated files etc
@@ -58,8 +43,6 @@ sysidle_smoke_0:
 .PHONY: clean
 clean:
 	$(RM) -r gen/*
-	$(RM) test/*.bc
-	$(RM) test/*.bpl
-	$(RM) test/*/*.bc
-	$(RM) test/*/*.bpl
-	$(RM) *.bc
+	find . -name "*.bc" -delete
+	find . -name "*.bpl" -delete
+	find . -name "*output.txt" -delete

@@ -199,7 +199,9 @@ int main(int argc, char *argv[])
   pthread_join(tids[1], &junk);
   pthread_join(tids[2], &junk);
   pthread_join(tids[3], &junk);
-  
+
+  // IB: added assert to show that all code is being run
+  assert(0);
   assert(full_sysidle_state != RCU_SYSIDLE_FULL_NOTED ||
 	 (atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
 	 (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0 &&

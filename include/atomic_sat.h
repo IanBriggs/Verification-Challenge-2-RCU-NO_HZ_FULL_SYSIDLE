@@ -1,6 +1,9 @@
 #ifndef _ASM_X86_ATOMIC_H
 #define _ASM_X86_ATOMIC_H
 
+// IB: added smack atomics
+#include "smack_atomics.h"
+
 // #include <linux/compiler.h>
 // #include <linux/types.h>
 // #include <asm/processor.h>
@@ -8,7 +11,7 @@
 // #include <asm/cmpxchg.h>
 
 typedef struct {
-	int counter;
+  int counter;
 } atomic_t;
 
 /*
@@ -26,7 +29,7 @@ typedef struct {
  */
 static inline int atomic_read(const atomic_t *v)
 {
-	return (*(volatile int *)&(v)->counter);
+  return (*(volatile int *)&(v)->counter);
 }
 
 /**
@@ -38,7 +41,7 @@ static inline int atomic_read(const atomic_t *v)
  */
 static inline void atomic_set(atomic_t *v, int i)
 {
-	v->counter = i;
+  v->counter = i;
 }
 
 /**
@@ -50,7 +53,9 @@ static inline void atomic_set(atomic_t *v, int i)
  */
 static inline void atomic_add(int i, atomic_t *v)
 {
-	__sync_fetch_and_add(&v->counter, i);
+  // IB: switched for smack call
+  // __sync_fetch_and_add(&v->counter, i);
+  smack_fetch_and_add(&v->counter, i);
 }
 
 /**
@@ -62,7 +67,7 @@ static inline void atomic_add(int i, atomic_t *v)
  */
 static inline void atomic_sub(int i, atomic_t *v)
 {
-	atomic_add(-i, v);
+  atomic_add(-i, v);
 }
 
 /**
@@ -76,7 +81,9 @@ static inline void atomic_sub(int i, atomic_t *v)
  */
 static inline int atomic_sub_and_test(int i, atomic_t *v)
 {
-	return __sync_sub_and_fetch(&v->counter, i) == 0;
+  // IB: switched for smack call
+  //return __sync_sub_and_fetch(&v->counter, i) == 0;
+  return smack_sub_and_fetch(&v->counter, i) == 0;
 }
 
 /**
@@ -87,10 +94,7 @@ static inline int atomic_sub_and_test(int i, atomic_t *v)
  */
 static inline void atomic_inc(atomic_t *v)
 {
-  // SMACK code
-  __SMACK_code("call corral_atomic_begin();");
-  v->counter = v->counter + 1;
-  __SMACK_code("call corral_atomic_end();");
+  atomic_add(1, v);
 }
 
 /**
@@ -101,7 +105,7 @@ static inline void atomic_inc(atomic_t *v)
  */
 static inline void atomic_dec(atomic_t *v)
 {
-	atomic_sub(1, v);
+  atomic_sub(1, v);
 }
 
 /**
@@ -114,7 +118,9 @@ static inline void atomic_dec(atomic_t *v)
  */
 static inline int atomic_dec_and_test(atomic_t *v)
 {
-	return __sync_sub_and_fetch(&v->counter, 1) == 0;
+  // IB: switched for smack call
+  // return __sync_sub_and_fetch(&v->counter, 1) == 0;
+  return smack_sub_and_fetch(&v->counter, 1) == 0;
 }
 
 /**
@@ -127,7 +133,9 @@ static inline int atomic_dec_and_test(atomic_t *v)
  */
 static inline int atomic_inc_and_test(atomic_t *v)
 {
-	return __sync_add_and_fetch(&v->counter, 1) == 0;
+  // IB: switched for smack call
+  // return __sync_add_and_fetch(&v->counter, 1) == 0;
+  return smack_add_and_fetch(&v->counter, 1) == 0;
 }
 
 /**
@@ -141,7 +149,9 @@ static inline int atomic_inc_and_test(atomic_t *v)
  */
 static inline int atomic_add_negative(int i, atomic_t *v)
 {
-	return __sync_add_and_fetch(&v->counter, i) < 0;
+  // IB: switched for smack call
+  //  return __sync_add_and_fetch(&v->counter, i) < 0;
+  return smack_add_and_fetch(&v->counter, i) < 0;
 }
 
 /**
@@ -153,7 +163,9 @@ static inline int atomic_add_negative(int i, atomic_t *v)
  */
 static inline int atomic_add_return(int i, atomic_t *v)
 {
-	return __sync_add_and_fetch(&v->counter, i);
+  // IB: switched for smack call
+  // return __sync_add_and_fetch(&v->counter, i);
+  return smack_add_and_fetch(&v->counter, i);
 }
 
 /**
@@ -165,7 +177,7 @@ static inline int atomic_add_return(int i, atomic_t *v)
  */
 static inline int atomic_sub_return(int i, atomic_t *v)
 {
-	return atomic_add_return(-i, v);
+  return atomic_add_return(-i, v);
 }
 
 #define atomic_inc_return(v)  (atomic_add_return(1, v))
@@ -173,18 +185,22 @@ static inline int atomic_sub_return(int i, atomic_t *v)
 
 static inline int atomic_cmpxchg(atomic_t *v, int old, int new)
 {
-	return __sync_val_compare_and_swap(&v->counter, old, new) == old;
+  // IB: switched for smack call
+  // return __sync_val_compare_and_swap(&v->counter, old, new) == old;
+  return smack_val_compare_and_swap(&v->counter, old, new) == old;
 }
 
 static inline int atomic_xchg(atomic_t *v, int new)
 {
-	int old;
+  int old;
 
-	for (;;) {
-		old = atomic_read(v);
-		if (__sync_val_compare_and_swap(&v->counter, old, new) == old)
-			return old;
-	}
+  for (;;) {
+    old = atomic_read(v);
+    // IB: switched for smack call
+    // if (__sync_val_compare_and_swap(&v->counter, old, new) == old)
+    if (smack_val_compare_and_swap(&v->counter, old, new) == old)
+      return old;
+  }
 }
 
 /**
@@ -198,17 +214,17 @@ static inline int atomic_xchg(atomic_t *v, int new)
  */
 static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 {
-	int c, old;
-	c = atomic_read(v);
-	for (;;) {
-		if (c == (u))
-			break;
-		old = atomic_cmpxchg((v), c, c + (a));
-		if (old == c)
-			break;
-		c = old;
-	}
-	return c;
+  int c, old;
+  c = atomic_read(v);
+  for (;;) {
+    if (c == (u))
+      break;
+    old = atomic_cmpxchg((v), c, c + (a));
+    if (old == c)
+      break;
+    c = old;
+  }
+  return c;
 }
 
 /**
@@ -220,7 +236,9 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
  */
 static inline short int atomic_inc_short(short int *v)
 {
-	__sync_fetch_and_add(v, 1);
+  // IB: switched for smack call
+  // __sync_fetch_and_add(v, 1);
+  smack_fetch_and_add(v, 1);
 }
 
 #ifdef CONFIG_X86_64
@@ -234,16 +252,20 @@ static inline short int atomic_inc_short(short int *v)
  */
 static inline void atomic_or_long(unsigned long *v1, unsigned long v2)
 {
-	__sync_fetch_and_or(v1, v2);
+  // IB: switched for smack call
+  // __sync_fetch_and_or(v1, v2);
+  smack_fetch_and_or(v1, v2);
 }
 #endif
 
 /* These are x86-specific, used by some header files */
-#define atomic_clear_mask(mask, addr)				\
-	__sync_fetch_and_and(addr, mask)
+  // IB: switched for smack call
+#define atomic_clear_mask(mask, addr)		\
+  smack_fetch_and_and(addr, mask)
 
-#define atomic_set_mask(mask, addr)				\
-	__sync_fetch_and_or(addr, mask)
+  // IB: switched for smack call
+#define atomic_set_mask(mask, addr)		\
+  smack_fetch_and_or(addr, mask)
 
 /* Atomic operations are already serializing on x86 */
 #define smp_mb__before_atomic_dec()	barrier()
