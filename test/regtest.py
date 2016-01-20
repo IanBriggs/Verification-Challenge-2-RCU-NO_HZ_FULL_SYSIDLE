@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 from os import path
 from multiprocessing.pool import ThreadPool
@@ -15,7 +15,7 @@ import glob
 import time
 import sys
 
-OVERRIDE_FIELDS = ['verifiers', 'memory', 'time-limit', 'skip']
+OVERRIDE_FIELDS = ['verifiers', 'memory', 'time-limit', 'skip', 'expect']
 APPEND_FIELDS = ['flags']
 
 def bold(text):
@@ -70,9 +70,9 @@ def metadata(file):
   with open(file, "r") as f:
     for line in f.readlines():
 
-      match = re.search(r'@skip', line)
+      match = re.search(r'@skip (true|false)', line)
       if match:
-        m['skip'] = True
+        m['skip'] = (match.group(1) == "true")
 
       match = re.search(r'@flag (.*)',line)
       if match:
@@ -113,16 +113,17 @@ def process_test(cmd, test, memory, verifier, expect, log_file):
     str_result += red('TIMEOUT', log_file)
   elif result == 'unknown':
     str_result += red('UNKNOWN', log_file)
-    print(cmd)
-    print(out)
-    print(err)
+    str_result += "\n\n\n\n" + " ".join(cmd) + "\n\n" + out + "\n\n" + err + "\n\n\n\n"
   else:
     str_result += red('FAILED ', log_file)
 
+  name = path.splitext(path.basename(test))[0]          
+  with open("{}-{}-{}-output.txt".format(path.dirname(test)+'/'+name, memory, verifier), 'w') as f:
+    f.write(' '.join(cmd)+"\n\n"+out+err)
   str_result += '  [%.2fs]' % round(elapsed, 2)
   return str_result
 
-passed = failed = timeouts = unknowns = 0
+passed = failed = timeouts = unknowns = skipped = total = 0
 def tally_result(result):
   """
   Tallies the result of each worker. This will only be called by the main thread.
@@ -144,6 +145,8 @@ def main():
   """
   Main entry point for the test suite.
   """
+  global skipped, total
+  
   t0 = time.time()
   num_cpus = multiprocessing.cpu_count()
 
@@ -190,18 +193,18 @@ def main():
 
     # start processing the tests.
     results = []
-    for test in glob.glob("./**/*.c"):
+    for test in sorted(glob.glob("./*/*/*.c")):
+      total += 1
+      
       # get the meta data for this test
       meta = metadata(test)
-
+       
       if meta['skip'] == True:
-        continue
-
-      if meta['skip'] != False and not args.all_examples:
+        skipped += 1
         continue
 
       # build up the subprocess command
-      cmd = ['smack.py', test]
+      cmd = ['smack', test]
       cmd += ['--time-limit', str(meta['time-limit'])]
       cmd += meta['flags']
 
@@ -211,12 +214,16 @@ def main():
         for verifier in meta['verifiers'][:100 if args.all_configs else 1]:
           name = path.splitext(path.basename(test))[0]
           cmd += ['--verifier=' + verifier]
-          cmd += ['-bc', "%s-%s-%s.bc" % (name, memory, verifier)]
-          cmd += ['-bpl', "%s-%s-%s.bpl" % (name, memory, verifier)]
-          r = p.apply_async(process_test,
+          cmd += ['-bc', "%s-%s-%s.bc" % (path.dirname(test)+'/'+name, memory, verifier)]
+          cmd += ['-bpl', "%s-%s-%s.bpl" % (path.dirname(test)+'/'+name, memory, verifier)]
+
+          if False:#"bad hack ian should remove":
+            tally_result(process_test(cmd[:], test, memory, verifier, meta['expect'], args.log_path,))
+          else:
+            r = p.apply_async(process_test,
                 args=(cmd[:], test, memory, verifier, meta['expect'], args.log_path,),
                 callback=tally_result)
-          results.append(r)
+            results.append(r)
 
     # keep the main thread active while there are active workers
     for r in results:
@@ -237,10 +244,15 @@ def main():
   logging.info(' ELAPSED TIME [%.2fs]' % round(elapsed_time, 2))
 
   # log the test results
-  logging.info(' PASSED count: %d' % passed)
-  logging.info(' FAILED count: %d' % failed)
+  logging.info(' SKIPPED count: %d' % skipped)
+  logging.info(' PASSED  count: %d' % passed)
+  logging.info(' FAILED  count: %d' % failed)
   logging.info(' TIMEOUT count: %d' % timeouts)
   logging.info(' UNKNOWN count: %d' % unknowns)
+  logging.info('\n TOTAL count: %d' % total)
+
+  if (total != (skipped + passed + failed + timeouts + unknowns)):
+    logging.info(red("ERROR:", None)+"number of tests does not equal total, there is a bug in regtest.py")
 
   # if there are any failed tests or tests that timed out, set the system
   # exit code to a failure status
