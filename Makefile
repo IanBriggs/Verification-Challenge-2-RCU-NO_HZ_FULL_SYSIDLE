@@ -4,8 +4,8 @@ SMACK_ARGS = --time-limit=36000 --pthread --loop-limit=10 --unroll=10 --verifier
 SMACK = smack $(SMACK_ARGS)
 
 .PHONY: all
-all: sysidle_sat sysidle sysidle_sat_smoke sysidle_smoke 
-
+all: 
+	echo "Runs take a long time, pick one or use the differential runner"
 
 
 
@@ -44,6 +44,14 @@ sysidle_bug_0:
 .PHONY: sysidle_sat_bug_0
 sysidle_sat_bug_0: 
 	-mkdir -p gen/sysidle_sat_bug_0 && cd gen/sysidle_sat_bug_0 && $(SMACK) $(CURDIR)/src/sysidle_sat_bug_0.c 2>&1 |  tee sysidle_sat_bug_0_output.txt
+
+.PHONY: sysidle_bug_1
+sysidle_bug_1: 
+	-mkdir -p gen/sysidle_bug_1 && cd gen/sysidle_bug_1 && $(SMACK) $(CURDIR)/src/sysidle_bug_1.c 2>&1 |  tee sysidle_bug_1_output.txt
+
+.PHONY: sysidle_sat_bug_1
+sysidle_sat_bug_1: 
+	-mkdir -p gen/sysidle_sat_bug_1 && cd gen/sysidle_sat_bug_1 && $(SMACK) $(CURDIR)/src/sysidle_sat_bug_1.c 2>&1 |  tee sysidle_sat_bug_1_output.txt
 
 
 # remove generated files etc
