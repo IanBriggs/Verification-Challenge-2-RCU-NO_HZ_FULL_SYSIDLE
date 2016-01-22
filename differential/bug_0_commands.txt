@@ -1,0 +1,25 @@
+
+smack --loop-limit=1 --time-limit=86400 --context-bound=2 --pthread --unroll=1 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=2 --time-limit=86400 --context-bound=2 --pthread --unroll=2 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=3 --time-limit=86400 --context-bound=2 --pthread --unroll=3 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=4 --time-limit=86400 --context-bound=2 --pthread --unroll=4 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=5 --time-limit=86400 --context-bound=2 --pthread --unroll=5 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=6 --time-limit=86400 --context-bound=2 --pthread --unroll=6 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=7 --time-limit=86400 --context-bound=2 --pthread --unroll=7 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=8 --time-limit=86400 --context-bound=2 --pthread --unroll=8 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=9 --time-limit=86400 --context-bound=2 --pthread --unroll=9 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+smack --loop-limit=10 --time-limit=86400 --context-bound=2 --pthread --unroll=10 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_bug_0.c
+
+
+smack --loop-limit=6 --time-limit=86400 --context-bound=2 --pthread --unroll=6 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_sat_bug_0.c
+smack --loop-limit=7 --time-limit=86400 --context-bound=2 --pthread --unroll=7 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_sat_bug_0.c
+smack --loop-limit=8 --time-limit=86400 --context-bound=2 --pthread --unroll=8 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_sat_bug_0.c
+smack --loop-limit=9 --time-limit=86400 --context-bound=2 --pthread --unroll=9 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_sat_bug_0.c
+smack --loop-limit=10 --time-limit=86400 --context-bound=2 --pthread --unroll=10 --verifier=corral --verifier-options="/trackAllVars /v:2" ../src/sysidle_sat_bug_0.c
+
+
+
+
+
+
+
