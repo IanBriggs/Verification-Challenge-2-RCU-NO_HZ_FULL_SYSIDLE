@@ -7,7 +7,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
-#include "fake.h"
+#include "fake_sat.h"
 
 // IB: changed to 3 CPUS (1 timing + 3 other)
 #define CONFIG_NR_CPUS 3

@@ -139,7 +139,7 @@ def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
 
         # print success/failure
         state = get_result(text.decode("utf-8"))
-        message = "Command: {}\n SMACK return: {}\nElapsed time: {}\n\n".format(next_command, state, end-start)
+        message = "Directory: {}\nCommand: {}\n SMACK return: {}\nElapsed time: {}\n\n".format(new_subdir, next_command, state, end-start)
         print(message)
             
 
@@ -196,19 +196,19 @@ def main():
         pro.start()
 
     # first output regardless
-    sys.stdout.write("Finished with {} out of {}\r".format(0, work_amount))
+    #sys.stdout.write("Finished with {} out of {}\r".format(0, work_amount))
 
     # print to stdout the current number of commands processed
     while(progress.value < work_amount):
         parent_conn.recv() # wait on recv
         progress_lock.acquire()
-        sys.stdout.write("Finished with {} out of {}\r".format(progress.value,
-                                                               work_amount))
+        #sys.stdout.write("Finished with {} out of {}\r".format(progress.value,
+        #                                                       work_amount))
         progress_lock.release()
         sys.stdout.flush()
 
     # final output so next print doesn't overwite progress info
-    print("Finished with {} out of {}".format(progress.value, work_amount))
+    #print("Finished with {} out of {}".format(progress.value, work_amount))
 
     # make sure we don't leave stragglers
     print("cleaning up")
