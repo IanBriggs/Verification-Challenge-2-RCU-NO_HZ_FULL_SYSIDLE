@@ -1,26 +1,35 @@
 
-smack --pthread --unroll=1 ../src/sysidle_smoke.c
-smack --pthread --unroll=2 ../src/sysidle_smoke.c
-smack --pthread --unroll=3 ../src/sysidle_smoke.c
-smack --pthread --unroll=4 ../src/sysidle_smoke.c
-smack --pthread --unroll=5 ../src/sysidle_smoke.c
-smack --pthread --unroll=6 ../src/sysidle_smoke.c
-smack --pthread --unroll=7 ../src/sysidle_smoke.c
-smack --pthread --unroll=8 ../src/sysidle_smoke.c
-smack --pthread --unroll=9 ../src/sysidle_smoke.c
-smack --pthread --unroll=10 ../src/sysidle_smoke.c
+smack --time-limit=172800 --pthread --unroll=1 ../src/sysidle_smoke.c
+smack --time-limit=172800 --pthread --unroll=2 ../src/sysidle_smoke.c
+smack --time-limit=172800 --pthread --unroll=3 ../src/sysidle_smoke.c
+smack --time-limit=172800 --pthread --unroll=4 ../src/sysidle_smoke.c
+smack --time-limit=172800 --pthread --unroll=5 ../src/sysidle_smoke.c
+smack --time-limit=172800 --pthread --unroll=6 ../src/sysidle_smoke.c
+
+smack --time-limit=172800 --pthread --unroll=1 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --pthread --unroll=2 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --pthread --unroll=3 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --pthread --unroll=4 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --pthread --unroll=5 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --pthread --unroll=6 ../src/sysidle_sat_smoke.c
 
 
-smack --pthread --unroll=1 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=2 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=3 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=4 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=5 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=6 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=7 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=8 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=9 ../src/sysidle_sat_smoke.c
-smack --pthread --unroll=10 ../src/sysidle_sat_smoke.c
+
+
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=1 ../src/sysidle_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=2 ../src/sysidle_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=3 ../src/sysidle_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=4 ../src/sysidle_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=5 ../src/sysidle_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=6 ../src/sysidle_smoke.c
+
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=1 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=2 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=3 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=4 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=5 ../src/sysidle_sat_smoke.c
+smack --time-limit=172800 --context-bound=2 --pthread --unroll=6 ../src/sysidle_sat_smoke.c
+
 
 
 
