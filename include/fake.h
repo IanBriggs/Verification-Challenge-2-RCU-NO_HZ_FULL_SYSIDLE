@@ -39,8 +39,7 @@ typedef _Bool                   bool;
 
 #define LOCK_PREFIX "\n\tlock; "
 
-// IB: changed to sat variant
-#include "atomic_sat.h"
+#include "atomic.h"
 
 /*
  * Non-existant functions to indicate usage errors at link time

@@ -57,7 +57,9 @@ static inline void atomic_add(int i, atomic_t *v)
 #ifdef SMACK_H_
 	smack_atomic_add(v, i);
 #else
-	__sync_fetch_and_add(&v->counter, i);
+	asm volatile(LOCK_PREFIX "addl %1,%0"
+		     : "+m" (v->counter)
+		     : "ir" (i));
 #endif
 }
 
@@ -73,7 +75,9 @@ static inline void atomic_sub(int i, atomic_t *v)
 #ifdef SMACK_H_
 	smack_atomic_sub(v, i);
 #else
-	atomic_add(-i, v);
+	asm volatile(LOCK_PREFIX "subl %1,%0"
+		     : "+m" (v->counter)
+		     : "ir" (i));
 #endif
 }
 
@@ -88,12 +92,16 @@ static inline void atomic_sub(int i, atomic_t *v)
  */
 static inline int atomic_sub_and_test(int i, atomic_t *v)
 {
+	unsigned char c;
 #ifdef SMACK_H_
 	smack_atomic_sub(v, i);
-	return (v->counter == 0);
+	c = (v->counter == 0);
 #else
-	return __sync_sub_and_fetch(&v->counter, i) == 0;
+	asm volatile(LOCK_PREFIX "subl %2,%0; sete %1"
+		     : "+m" (v->counter), "=qm" (c)
+		     : "ir" (i) : "memory");
 #endif
+	return c;
 }
 
 /**
@@ -104,7 +112,12 @@ static inline int atomic_sub_and_test(int i, atomic_t *v)
  */
 static inline void atomic_inc(atomic_t *v)
 {
-	atomic_add(1, v);
+#ifdef SMACK_H_
+	smack_atomic_add(v, 1);
+#else
+	asm volatile(LOCK_PREFIX "incl %0"
+		     : "+m" (v->counter));
+#endif
 }
 
 /**
@@ -115,7 +128,12 @@ static inline void atomic_inc(atomic_t *v)
  */
 static inline void atomic_dec(atomic_t *v)
 {
-	atomic_sub(1, v);
+#ifdef SMACK_H_
+	smack_atomic_sub(v, 1);
+#else
+	asm volatile(LOCK_PREFIX "decl %0"
+		     : "+m" (v->counter));
+#endif
 }
 
 /**
@@ -128,12 +146,16 @@ static inline void atomic_dec(atomic_t *v)
  */
 static inline int atomic_dec_and_test(atomic_t *v)
 {
+	unsigned char c;
 #ifdef SMACK_H_
 	smack_atomic_sub(v, 1);
-        return (v->counter == 0);
+        c = (v->counter == 0);
 #else
-	return __sync_sub_and_fetch(&v->counter, 1) == 0;
+	asm volatile(LOCK_PREFIX "decl %0; sete %1"
+		     : "+m" (v->counter), "=qm" (c)
+		     : : "memory");
 #endif
+	return c != 0;
 }
 
 /**
@@ -146,12 +168,16 @@ static inline int atomic_dec_and_test(atomic_t *v)
  */
 static inline int atomic_inc_and_test(atomic_t *v)
 {
+	unsigned char c;
 #ifdef SMACK_H_
 	smack_atomic_add(v, 1);
-        return (v->counter == 0);
+        c = (v->counter == 0);
 #else
-	return __sync_add_and_fetch(&v->counter, 1) == 0;
+	asm volatile(LOCK_PREFIX "incl %0; sete %1"
+		     : "+m" (v->counter), "=qm" (c)
+		     : : "memory");
 #endif
+	return c != 0;
 }
 
 /**
@@ -165,12 +191,16 @@ static inline int atomic_inc_and_test(atomic_t *v)
  */
 static inline int atomic_add_negative(int i, atomic_t *v)
 {
+	unsigned char c;
 #ifdef SMACK_H_
 	smack_atomic_add(v, i);
-        return (v->counter < 0);
+        c = (v->counter < 0);
 #else
-	return __sync_add_and_fetch(&v->counter, i) < 0;
+	asm volatile(LOCK_PREFIX "addl %2,%0; sets %1"
+		     : "+m" (v->counter), "=qm" (c)
+		     : "ir" (i) : "memory");
 #endif
+	return c;
 }
 
 /**
@@ -185,7 +215,7 @@ static inline int atomic_add_return(int i, atomic_t *v)
 #ifdef SMACK_H_
         return i + smack_atomic_xadd(&v->counter, i);
 #else
-	return __sync_add_and_fetch(&v->counter, i);
+	return i + xadd(&v->counter, i);
 #endif
 }
 
@@ -209,7 +239,7 @@ static inline int atomic_cmpxchg(atomic_t *v, int old, int new)
 #ifdef SMACK_H_
         return smack_atomic_cmpxchg(&v->counter, old, new);
 #else
-	return __sync_val_compare_and_swap(&v->counter, old, new) == old;
+	return cmpxchg(&v->counter, old, new);
 #endif
 }
 
@@ -218,13 +248,7 @@ static inline int atomic_xchg(atomic_t *v, int new)
 #ifdef SMACK_H_
         return smack_atomic_xchg(&v->counter, new);
 #else
-	int old;
-
-	for (;;) {
-		old = atomic_read(v);
-		if (__sync_val_compare_and_swap(&v->counter, old, new) == old)
-			return old;
-	}
+	return xchg(&v->counter, new);
 #endif
 }
 
@@ -242,10 +266,10 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 	int c, old;
 	c = atomic_read(v);
 	for (;;) {
-		if (c == (u))
+		if (unlikely(c == (u)))
 			break;
 		old = atomic_cmpxchg((v), c, c + (a));
-		if (old == c)
+		if (likely(old == c))
 			break;
 		c = old;
 	}
@@ -263,10 +287,10 @@ static inline short int atomic_inc_short(short int *v)
 {
 #ifdef SMACK_H_
 	smack_atomic_add_short(v, 1);
-	return *v;
 #else
-	__sync_fetch_and_add(v, 1);
+	asm(LOCK_PREFIX "addw $1, %0" : "+m" (*v));
 #endif
+	return *v;
 }
 
 #ifdef CONFIG_X86_64
@@ -284,7 +308,7 @@ static inline void atomic_or_long(unsigned long *v1, unsigned long v2)
         // This is unused in the main sysidle code
         assert(0);
 #else
-	__sync_fetch_and_or(v1, v2);
+	asm(LOCK_PREFIX "orq %1, %0" : "+m" (*v1) : "r" (v2));
 #endif
 }
 #endif
@@ -296,13 +320,16 @@ static inline void atomic_or_long(unsigned long *v1, unsigned long v2)
 
 #define atomic_set_mask(maske, addr)                            \
         assert(0);
-#else
+#else	
 /* These are x86-specific, used by some header files */
 #define atomic_clear_mask(mask, addr)				\
-	__sync_fetch_and_and(addr, mask)
+	asm volatile(LOCK_PREFIX "andl %0,%1"			\
+		     : : "r" (~(mask)), "m" (*(addr)) : "memory")
 
 #define atomic_set_mask(mask, addr)				\
-	__sync_fetch_and_or(addr, mask)
+	asm volatile(LOCK_PREFIX "orl %0,%1"			\
+		     : : "r" ((unsigned)(mask)), "m" (*(addr))	\
+		     : "memory")
 #endif
 
 /* Atomic operations are already serializing on x86 */

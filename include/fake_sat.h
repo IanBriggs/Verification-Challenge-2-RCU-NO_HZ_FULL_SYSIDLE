@@ -45,7 +45,9 @@ typedef _Bool                   bool;
  * use "asm volatile" and "memory" clobbers to prevent gcc from moving
  * information around.
  */
-// IB: intrinsic call changed to smack
+#ifdef SMACK_H_
+#define xchg(ptr, v) ({smack_atomic_xchg(ptr, v);})
+#else
 #define xchg(ptr, v)	\
 ({ \
 	__typeof__(*(ptr)) __old; \
@@ -53,19 +55,34 @@ typedef _Bool                   bool;
 	__typeof__(*(ptr)) __v; \
 	for (;;) { \
 		__old = ACCESS_ONCE(*ptr); \
-		if (smack_val_compare_and_swap(__ptr, __old, __v) == __old) \
+		if (__sync_val_compare_and_swap(__ptr, __old, __v) == __old) \
 			return __old; \
 	} \
 	__old; \
 })
+#endif
 
 /*
  * Atomic compare and exchange.  Compare OLD with MEM, if identical,
  * store NEW in MEM.  Return the initial value in MEM.  Success is
  * indicated by comparing RETURN with OLD.
  */
+#ifdef SMACK_H_
 #define __raw_cmpxchg(ptr, old, new, size, lock)			\
-	smack_val_compare_and_swap(ptr, old, new)
+        smack_atomic_cmpxchg(ptr, old, new)
+
+#define __cmpxchg(ptr, old, new, size)					\
+        smack_atomic_cmpxchg(ptr, old, new)
+
+#define __sync_cmpxchg(ptr, old, new, size)				\
+        smack_atomic_cmpxchg(ptr, old, new)
+
+#define __cmpxchg_local(ptr, old, new, size)				\
+        smack_atomic_cmpxchg(ptr, old, new)
+
+#else
+#define __raw_cmpxchg(ptr, old, new, size, lock)			\
+	__sync_val_compare_and_swap(ptr, old, new)
 
 #define __cmpxchg(ptr, old, new, size)					\
 	__raw_cmpxchg((ptr), (old), (new), (size), LOCK_PREFIX)
@@ -76,9 +93,22 @@ typedef _Bool                   bool;
 #define __cmpxchg_local(ptr, old, new, size)				\
 	__raw_cmpxchg((ptr), (old), (new), (size), "")
 
+#endif
+
 #include "cmpxchg_32_sat.h"
 
 // #ifdef __HAVE_ARCH_CMPXCHG
+#ifdef SMACK_H_
+#define cmpxchg(ptr, old, new)						\
+        smack_atomic_cmpxchg(ptr, old, new)
+
+#define sync_cmpxchg(ptr, old, new)					\
+        smack_atomic_cmpxchg(ptr, old, new)
+
+#define cmpxchg_local(ptr, old, new)					\
+        smack_atomic_cmpxchg(ptr, old, new)
+
+#else
 #define cmpxchg(ptr, old, new)						\
 	__cmpxchg(ptr, old, new, sizeof(*(ptr)))
 
@@ -87,6 +117,7 @@ typedef _Bool                   bool;
 
 #define cmpxchg_local(ptr, old, new)					\
 	__cmpxchg_local(ptr, old, new, sizeof(*(ptr)))
+#endif
 // #endif
 
 /*
@@ -97,12 +128,21 @@ typedef _Bool                   bool;
  * xadd_sync() is always locked
  * xadd_local() is never locked
  */
+#ifdef SMACK_H_
+#define __xadd(ptr, inc, lock)	smack_atomic_xadd(ptr, inc)
+#else
 #define __xadd(ptr, inc, lock)	__sync_fetch_and_add(ptr, inc)
+#endif
+
 #define xadd(ptr, inc)		__xadd((ptr), (inc), LOCK_PREFIX)
 #define xadd_sync(ptr, inc)	__xadd((ptr), (inc), "lock; ")
 #define xadd_local(ptr, inc)	__xadd((ptr), (inc), "")
 
+#ifdef SMACK_H_
+#define __add(ptr, inc, lock) smack_atomic_xadd(ptr, inc)
+#else
 #define __add(ptr, inc, lock) __sync_fetch_and_add(ptr, inc)
+#endif
 
 /*
  * add_*() adds "inc" to "*ptr"
@@ -114,9 +154,19 @@ typedef _Bool                   bool;
 #define add_smp(ptr, inc)	__add((ptr), (inc), LOCK_PREFIX)
 #define add_sync(ptr, inc)	__add((ptr), (inc), "lock; ")
 
-#define barrier() // IB: removed __asm__ __volatile__("": : :"memory")
+#ifdef SMACK_H_
+#define barrier()
+#else
+#define barrier() __asm__ __volatile__("": : :"memory")
+#endif
+
 #define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))
-#define smp_mb() // IB: removed asm volatile("mfence":::"memory")
+
+#ifdef SMACK_H_
+#define smp_mb() 
+#else
+#define smp_mb() asm volatile("mfence":::"memory")
+#endif
 
 #define likely(x) (x)
 #define unlikely(x) (x)
