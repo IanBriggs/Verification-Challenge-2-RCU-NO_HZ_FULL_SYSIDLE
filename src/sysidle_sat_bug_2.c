@@ -1,11 +1,10 @@
 // IB: added pthread so smack can override
-#include "smack.h"
 #include <pthread.h>
 
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+//#include <pthread.h>
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
@@ -15,7 +14,8 @@ int __unbuffered_cnt = 0;
 
 #define ITER 5
 
-#define CONFIG_NR_CPUS 3
+// IB: changed to 2 CPUS (1 timing + 2 other)
+#define CONFIG_NR_CPUS 2
 #define NR_CPUS CONFIG_NR_CPUS
 #define CONFIG_RCU_FANOUT 16
 #define CONFIG_RCU_FANOUT_LEAF 8
@@ -51,7 +51,6 @@ static int rcu_gp_in_progress(struct rcu_state *rsp)
   return 0;
 }
 
-// IB: bug
 #include "sysidle_bug_2.h"
 
 int nthreads = CONFIG_NR_CPUS;
@@ -186,7 +185,6 @@ int main(int argc, char *argv[])
   pthread_create(&tids[i], NULL, timekeeping_cpu, &ta_array[i]); i++;
   pthread_create(&tids[i], NULL, other_cpu, &ta_array[i]); i++;
   pthread_create(&tids[i], NULL, other_cpu, &ta_array[i]); i++;
-  pthread_create(&tids[i], NULL, other_cpu, &ta_array[i]); i++;
 	 
   /* __CPROVER_ASYNC_0: timekeeping_cpu(&ta_array[0]); i++; */
   /* __CPROVER_ASYNC_1: other_cpu(&ta_array[1]); i++; */
@@ -199,10 +197,11 @@ int main(int argc, char *argv[])
   pthread_join(tids[0], &junk);
   pthread_join(tids[1], &junk);
   pthread_join(tids[2], &junk);
-  pthread_join(tids[3], &junk);
   
-  assert(full_sysidle_state != RCU_SYSIDLE_FULL_NOTED ||
-	 (atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
-	 (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0 &&
-	 (atomic_read(&rcu_preempt_data_array[3].dynticks->dynticks_idle) & 0x1) == 0);
+  // IB: assert added for smack, must be modified to meet number of CPUs
+  assert(((full_sysidle_state != RCU_SYSIDLE_FULL_NOTED) &&
+	  ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) != 0 &&
+	   (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) != 0)) ||
+	 ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
+	  (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0));
 }

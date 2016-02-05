@@ -1,4 +1,4 @@
-// IB: added pthread so smack can override
+// IB: added pthread
 #include <pthread.h>
 
 #include <stdio.h>
@@ -9,8 +9,8 @@
 #include <string.h>
 #include "fake_sat.h"
 
-// IB: changed to 3 CPUS (1 timing + 3 other)
-#define CONFIG_NR_CPUS 3
+// IB: changed to 2 CPUS (1 timing + 2 other)
+#define CONFIG_NR_CPUS 2
 
 #define NR_CPUS CONFIG_NR_CPUS
 #define CONFIG_RCU_FANOUT 16
@@ -47,7 +47,6 @@ static int rcu_gp_in_progress(struct rcu_state *rsp)
   return 0;
 }
 
-// IB: bug
 #include "sysidle_bug_2.h"
 
 int goflag = 1;
@@ -160,12 +159,13 @@ int main(int argc, char *argv[])
   struct thread_arg *ta_array;
   pthread_t *tids;
 
-  /* Parse single optional argument, # cpus. */
-  if (argc > 1) {
-    nr_cpu_ids = atoi(argv[1]);
-    nthreads = nr_cpu_ids;
-    printf("nr_cpu_ids set to %d\n", nr_cpu_ids);
-  }
+  // IB: removed dynamic cpu count
+  /* /\* Parse single optional argument, # cpus. *\/ */
+  /* if (argc > 1) { */
+  /*   nr_cpu_ids = atoi(argv[1]); */
+  /*   nthreads = nr_cpu_ids; */
+  /*   printf("nr_cpu_ids set to %d\n", nr_cpu_ids); */
+  /* } */
 
   /* Allocate arrays and initialize. */
   rcu_preempt_data_array =
@@ -238,10 +238,12 @@ int main(int argc, char *argv[])
   }
 
   // IB: assert added for smack, must be modified to meet number of CPUs
-  assert(full_sysidle_state != RCU_SYSIDLE_FULL_NOTED ||
-	 (atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
-	 (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0 &&
-	 (atomic_read(&rcu_preempt_data_array[3].dynticks->dynticks_idle) & 0x1) == 0);
+  assert(((full_sysidle_state != RCU_SYSIDLE_FULL_NOTED) &&
+	  ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) != 0 &&
+	   (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) != 0)) ||
+	 ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
+	  (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0));
+
 	
 printf("End of stress test.\n");
 }
