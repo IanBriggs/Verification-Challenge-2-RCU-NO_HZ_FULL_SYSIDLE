@@ -4,9 +4,8 @@
 int
 main(int argc, char ** argv)
 {
-  atomic_t a;
-  a.counter = 0;
+  short a = 0;  
 
-  atomic_add(2, &a);
-  assert(a.counter == 2);
+  atomic_inc_short(&a);
+  assert(a == 1);
 }

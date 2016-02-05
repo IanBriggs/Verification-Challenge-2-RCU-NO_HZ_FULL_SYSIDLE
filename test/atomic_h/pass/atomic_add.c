@@ -1,5 +1,5 @@
 #include "smack.h"
-#include "atomic_sat.h"
+#include "atomic.h"
 
 int
 main(int argc, char ** argv)
