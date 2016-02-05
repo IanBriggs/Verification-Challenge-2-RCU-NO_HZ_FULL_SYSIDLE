@@ -1,6 +1,6 @@
 export C_INCLUDE_PATH := $(CURDIR)/include:$(C_INCLUDE_PATH)
 
-SMACK_ARGS = --time-limit=36000 --pthread --loop-limit=10 --unroll=10 --verifier=corral --context-bound=2 --verifier-options="/trackAllVars /v:2"
+SMACK_ARGS = --time-limit=36000 --pthread --unroll=10 --context-bound=1
 SMACK = smack $(SMACK_ARGS)
 
 .PHONY: all

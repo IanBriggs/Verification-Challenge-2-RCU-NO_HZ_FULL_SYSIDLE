@@ -242,7 +242,7 @@ static void rcu_sysidle(unsigned long j)
 		 * cmpxchg failure means race with non-idle, let them win.
 		 */
 		if (ULONG_CMP_GE(jiffies, j + rcu_sysidle_delay()))
-			(void)cmpxchg(&full_sysidle_state,]
+		  (void)cmpxchg(&full_sysidle_state,
 			  // IB: Bug
 				      RCU_SYSIDLE_LONG, RCU_SYSIDLE_LONG);
 		break;
