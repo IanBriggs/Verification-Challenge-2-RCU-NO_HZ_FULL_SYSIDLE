@@ -14,6 +14,14 @@ import os
 
 from pprint import pprint
 
+output_lock = MP.Lock()
+csv_file = "differential_run.csv"
+
+
+def un_color(text):
+    return text.replace('\033[0m','').replace('\033[0;31m','').replace('\033[0;32m','').replace('\033[0;33m','')
+
+
 def red(text):
     return '\033[0;31m' + text + '\033[0m'
 
@@ -62,7 +70,7 @@ def expand_path(text):
 
 def command_expand(command_list):
     command_list = list(map(expand_path, command_list))
-    return ' '.join(command_list)
+    return command_list
 
 
 def generate_work_queue(command_file):
@@ -76,13 +84,13 @@ def generate_work_queue(command_file):
         
     # split out commands
     commands = commands.splitlines()
-    commands = [command.split(" ") for command in commands if command.strip() != '']
+    commands = [command.split(", ") for command in commands if command.strip() != '']
     commands = list(map(command_expand, commands))
 
     # queue them up
     work_queue = MP.Queue()
     for command in commands:
-        work_queue.put(command)
+        work_queue.put((command[0], int(command[1]), int(command[2])))
     
     return work_queue
 
@@ -110,7 +118,7 @@ def get_result(output):
 
 def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
         # get the next command
-        next_command = work_queue.get()
+        file_path, context_bound, unroll = work_queue.get()
 
         # get to base
         os.chdir(output_dir)
@@ -126,6 +134,7 @@ def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
         os.chdir(new_subdir)
 
         # run
+        next_command = "smack --time-limit=172800 --pthread --context-bound={} --unroll={} {}".format(context_bound, unroll, file_path)
         start = T.time()
         with SP.Popen(next_command, stdout=SP.PIPE, stderr=SP.STDOUT, shell=True) as proc:
             text = proc.stdout.read()
@@ -140,7 +149,12 @@ def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
         # print success/failure
         state = get_result(text.decode("utf-8"))
         message = "Directory: {}\nCommand: {}\n SMACK return: {}\nElapsed time: {}\n\n".format(new_subdir, next_command, state, end-start)
+        csv_entry = "{}, {}, {}, {}, {}\n".format(file_path, context_bound, unroll, un_color(state), end-start)
+        output_lock.acquire()
         print(message)
+        with open(os.path.join(output_dir, csv_file), 'a') as f:
+            f.write(csv_entry)
+        output_lock.release()
             
 
 def process_worker(progress_lock, progress,dirnum_lock, dirnum, 

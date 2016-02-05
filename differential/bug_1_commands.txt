@@ -1,30 +1,21 @@
+../src/sysidle_bug_1.c, 1, 2
+../src/sysidle_bug_1.c, 1, 3
+../src/sysidle_bug_1.c, 1, 4
+../src/sysidle_bug_1.c, 1, 5
 
-smack --time-limit=172800 --pthread --unroll=1 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --pthread --unroll=2 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --pthread --unroll=3 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --pthread --unroll=4 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --pthread --unroll=5 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --pthread --unroll=6 ../src/sysidle_bug_1.c
-
-smack --time-limit=172800 --pthread --unroll=5 ../src/sysidle_sat_bug_1.c
-smack --time-limit=172800 --pthread --unroll=6 ../src/sysidle_sat_bug_1.c
-
+../src/sysidle_bug_1.c, 2, 2
+../src/sysidle_bug_1.c, 2, 3
+../src/sysidle_bug_1.c, 2, 4
+../src/sysidle_bug_1.c, 2, 5
 
 
+../src/sysidle_sat_bug_1.c, 1, 5
+../src/sysidle_sat_bug_1.c, 1, 6
+../src/sysidle_sat_bug_1.c, 1, 7
 
-smack --time-limit=172800 --context-bound=2 --pthread --unroll=1 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --context-bound=2 --pthread --unroll=2 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --context-bound=2 --pthread --unroll=3 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --context-bound=2 --pthread --unroll=4 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --context-bound=2 --pthread --unroll=5 ../src/sysidle_bug_1.c
-smack --time-limit=172800 --context-bound=2 --pthread --unroll=6 ../src/sysidle_bug_1.c
-
-smack --time-limit=172800 --context-bound=2 --pthread --unroll=5 ../src/sysidle_sat_bug_1.c
-smack --time-limit=172800 --context-bound=2 --pthread --unroll=6 ../src/sysidle_sat_bug_13.c
-
-
-
-
+../src/sysidle_sat_bug_1.c, 2, 5
+../src/sysidle_sat_bug_1.c, 2, 6
+../src/sysidle_sat_bug_1.c, 2, 7
 
 
 
