@@ -1,5 +1,7 @@
+
 // IB: added pthread
 #include <pthread.h>
+#include "smack.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +9,9 @@
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
-#include "fake_sat.h"
+#include <poll.h> 
+#include <unistd.h>
+#include "fake.h"
 
 // IB: changed to 2 CPUS (1 timing + 2 other)
 #define CONFIG_NR_CPUS 2
@@ -114,6 +118,7 @@ void *timekeeping_cpu(void *arg)
     do_fqs(&rcu_preempt_state, rcu_preempt_data_array);
     do_fqs(&rcu_sched_state, rcu_sched_data_array);
   }
+  return NULL;
 }
 
 void *other_cpu(void *arg)
@@ -151,6 +156,7 @@ void *other_cpu(void *arg)
     /* idle exit. */
     rcu_sysidle_exit(rdtp, 0);
   }
+  return NULL;
 }
 
 int main(int argc, char *argv[])
@@ -238,12 +244,11 @@ int main(int argc, char *argv[])
   }
 
   // IB: assert added for smack, must be modified to meet number of CPUs
-  assert(((full_sysidle_state != RCU_SYSIDLE_FULL_NOTED) &&
-	  ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) != 0 &&
-	   (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) != 0)) ||
-	 ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
-	  (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0));
+  if (full_sysidle_state == RCU_SYSIDLE_FULL_NOTED) {
+    for (i = 1; i < nthreads; i++) {
+      assert((atomic_read(&rcu_preempt_data_array[i].dynticks->dynticks_idle) & 0x1) == 0);
+    }
+  }
 
-	
-printf("End of stress test.\n");
+  return 0;
 }

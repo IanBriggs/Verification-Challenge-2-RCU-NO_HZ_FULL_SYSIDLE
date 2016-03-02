@@ -1,4 +1,5 @@
 // IB: added pthread so smack can override
+#include "smack.h"
 #include <pthread.h>
 
 
@@ -8,11 +9,13 @@
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
+#include <poll.h> 
+#include <unistd.h>
 #include "fake_sat.h"
 
 int __unbuffered_cnt = 0;
 
-#define ITER 5
+#define ITER 2
 
 // IB: changed to 2 CPUS (1 timing + 2 other)
 #define CONFIG_NR_CPUS 2
@@ -112,6 +115,7 @@ void *timekeeping_cpu(void *arg)
   // IB: removed
   //asm("sync");
   __unbuffered_cnt++;
+  return NULL;
 }
 
 void *other_cpu(void *arg)
@@ -141,6 +145,7 @@ void *other_cpu(void *arg)
   // IB: removed
   //asm("sync");
   __unbuffered_cnt++;
+  return NULL;
 }
 
 int main(int argc, char *argv[])
@@ -182,9 +187,10 @@ int main(int argc, char *argv[])
   /* Stress test. */
   i = 0;
   // IB: changed from cprover to pthread calls
-  pthread_create(&tids[i], NULL, timekeeping_cpu, &ta_array[i]); i++;
-  pthread_create(&tids[i], NULL, other_cpu, &ta_array[i]); i++;
-  pthread_create(&tids[i], NULL, other_cpu, &ta_array[i]); i++;
+  pthread_create(&tids[0], NULL, timekeeping_cpu, &ta_array[0]);
+  for (i = 1; i < nthreads; i++) {
+    pthread_create(&tids[i], NULL, other_cpu, &ta_array[i]);
+  }
 	 
   /* __CPROVER_ASYNC_0: timekeeping_cpu(&ta_array[0]); i++; */
   /* __CPROVER_ASYNC_1: other_cpu(&ta_array[1]); i++; */
@@ -193,16 +199,15 @@ int main(int argc, char *argv[])
   /* __CPROVER_assume(__unbuffered_cnt == i); */
 
   // IB: added pthread join calls
-    void * junk;
-  pthread_join(tids[0], &junk);
-  pthread_join(tids[1], &junk);
-  pthread_join(tids[2], &junk);
-  
+  for (i = 0; i < nthreads; i++) {
+    void *junk;
+
+    if (pthread_join(tids[i], &junk) != 0) {
+      perror("pthread_join()");
+      abort();
+    }
+  }
+
   // IB: assert added for smack, must be modified to meet number of CPUs
-  assert(((full_sysidle_state != RCU_SYSIDLE_FULL_NOTED) &&
-	  ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) != 0 &&
-	   (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) != 0)) ||
-	 ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
-	  (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0));
   assert(0);
 }

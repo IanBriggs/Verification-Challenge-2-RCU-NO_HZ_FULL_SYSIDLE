@@ -2,7 +2,9 @@
 # Ian Briggs
 # U0692013
 #
-# Keep a large machine always churning
+
+base_include=None
+command="smack --time-limit=86400 --pthread --context-bound={k} --unroll={n} --loop-limit={n} --clang-options=\"-I{include} -I{extra_include}\" {file}"
 
 import multiprocessing as MP
 import subprocess as SP
@@ -33,6 +35,7 @@ def yellow(text):
 
 
 def parse_args():
+    global base_include
     desc = "Schedule long running jobs in a batch-style fashion"
     epi =  "Commands are run in subdiretories of the output directory"         \
            ".stout and stderr of the command are put "                         \
@@ -46,6 +49,8 @@ def parse_args():
     parser.add_argument("-o", metavar="output_dir", type=str, default="gen",
                         help="directory to put output subdirectories into, "
                         "default is \"gen\"")
+    parser.add_argument("-I", metavar="base_include", type=str, 
+                        help="Base include directory")
     args = parser.parse_args()
     
     count = args.p
@@ -57,6 +62,8 @@ def parse_args():
             count = MP.cpu_count()
         except ValueError:
             count = 1
+
+    base_include = os.path.abspath(args.I)
 
     return {"procs" : count, 
             "output_dir" : args.o,
@@ -90,7 +97,7 @@ def generate_work_queue(command_file):
     # queue them up
     work_queue = MP.Queue()
     for command in commands:
-        work_queue.put((command[0], int(command[1]), int(command[2])))
+        work_queue.put((command[0], int(command[1]), int(command[2]), command[3]))
     
     return work_queue
 
@@ -118,7 +125,7 @@ def get_result(output):
 
 def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
         # get the next command
-        file_path, context_bound, unroll = work_queue.get()
+        file_path, context_bound, unroll, sysidle_include = work_queue.get()
 
         # get to base
         os.chdir(output_dir)
@@ -134,7 +141,7 @@ def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
         os.chdir(new_subdir)
 
         # run
-        next_command = "smack --time-limit=172800 --pthread --context-bound={} --unroll={} {}".format(context_bound, unroll, file_path)
+        next_command = command.format(k=context_bound, n=unroll, file=file_path, include=base_include, extra_include=sysidle_include)
         start = T.time()
         with SP.Popen(next_command, stdout=SP.PIPE, stderr=SP.STDOUT, shell=True) as proc:
             text = proc.stdout.read()
@@ -149,7 +156,7 @@ def run_command(dirnum_lock, dirnum, work_queue, child_conn, output_dir):
         # print success/failure
         state = get_result(text.decode("utf-8"))
         message = "Directory: {}\nCommand: {}\n SMACK return: {}\nElapsed time: {}\n\n".format(new_subdir, next_command, state, end-start)
-        csv_entry = "{}, {}, {}, {}, {}\n".format(file_path, context_bound, unroll, un_color(state), end-start)
+        csv_entry = "{} {} {} {} {} {} {}\n".format(file_path, sysidle_include, context_bound, unroll, un_color(state), end-start, new_subdir)
         output_lock.acquire()
         print(message)
         with open(os.path.join(output_dir, csv_file), 'a') as f:

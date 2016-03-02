@@ -39,12 +39,16 @@ typedef _Bool                   bool;
 
 #define LOCK_PREFIX "\n\tlock; "
 
+#define likely(x) (x)
+#define unlikely(x) (x)
+
 #include "atomic.h"
 
 /*
  * Non-existant functions to indicate usage errors at link time
  * (or compile-time if the compiler implements __compiletime_error().
  */
+#ifndef SMACK_H_
 #define __compiletime_error(message) __attribute__((error(message)))
 extern void __xchg_wrong_size(void)
 	__compiletime_error("Bad argument size for xchg");
@@ -54,6 +58,7 @@ extern void __xadd_wrong_size(void)
 	__compiletime_error("Bad argument size for xadd");
 extern void __add_wrong_size(void)
 	__compiletime_error("Bad argument size for add");
+#endif
 
 /*
  * Constants for operation sizes. On 32-bit, the 64-bit size it set to
@@ -75,6 +80,10 @@ extern void __add_wrong_size(void)
  * An exchange-type operation, which takes a value and a pointer, and
  * returns a the old value.
  */
+#ifdef SMACK_H_
+#define __xchg_op(ptr, arg, op, lock) ({smack_atomic_xchg(ptr, arg);})
+
+#else
 #define __xchg_op(ptr, arg, op, lock)					\
 	({								\
 	        __typeof__ (*(ptr)) __ret = (arg);			\
@@ -104,7 +113,7 @@ extern void __add_wrong_size(void)
 		}							\
 		__ret;							\
 	})
-
+#endif
 /*
  * Note: no "lock" prefix even on SMP: xchg always implies lock anyway.
  * Since this is generally used to protect other memory information, we
@@ -118,6 +127,11 @@ extern void __add_wrong_size(void)
  * store NEW in MEM.  Return the initial value in MEM.  Success is
  * indicated by comparing RETURN with OLD.
  */
+#ifdef SMACK_H_
+#define __raw_cmpxchg(ptr, old, new, size, lock)			\
+        smack_atomic_cmpxchg(ptr, old, new)
+
+#else
 #define __raw_cmpxchg(ptr, old, new, size, lock)			\
 ({									\
 	__typeof__(*(ptr)) __ret;					\
@@ -165,6 +179,7 @@ extern void __add_wrong_size(void)
 	}								\
 	__ret;								\
 })
+#endif
 
 #define __cmpxchg(ptr, old, new, size)					\
 	__raw_cmpxchg((ptr), (old), (new), (size), LOCK_PREFIX)
@@ -201,6 +216,10 @@ extern void __add_wrong_size(void)
 #define xadd_sync(ptr, inc)	__xadd((ptr), (inc), "lock; ")
 #define xadd_local(ptr, inc)	__xadd((ptr), (inc), "")
 
+#ifdef SMACK_H_
+#define __add(ptr, inc, lock)	smack_atomic_xadd(ptr, inc)
+
+#else
 #define __add(ptr, inc, lock)						\
 	({								\
 	        __typeof__ (*(ptr)) __ret = (inc);			\
@@ -230,6 +249,7 @@ extern void __add_wrong_size(void)
 		}							\
 		__ret;							\
 	})
+#endif
 
 /*
  * add_*() adds "inc" to "*ptr"
@@ -241,6 +261,10 @@ extern void __add_wrong_size(void)
 #define add_smp(ptr, inc)	__add((ptr), (inc), LOCK_PREFIX)
 #define add_sync(ptr, inc)	__add((ptr), (inc), "lock; ")
 
+#ifdef SMACK_H_
+#define __cmpxchg_double(pfx, p1, p2, o1, o2, n1, n2)  assert(0);
+
+#else
 #define __cmpxchg_double(pfx, p1, p2, o1, o2, n1, n2)			\
 ({									\
 	bool __ret;							\
@@ -257,19 +281,23 @@ extern void __add_wrong_size(void)
 		       "b" (__new1), "c" (__new2));			\
 	__ret;								\
 })
+#endif
 
 #define cmpxchg_double(p1, p2, o1, o2, n1, n2) \
 	__cmpxchg_double(LOCK_PREFIX, p1, p2, o1, o2, n1, n2)
 
 #define cmpxchg_double_local(p1, p2, o1, o2, n1, n2) \
 	__cmpxchg_double(, p1, p2, o1, o2, n1, n2)
+#ifdef SMACK_H_
+#define barrier() 
+#define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))
+#define smp_mb() 
 
+#else
 #define barrier() __asm__ __volatile__("": : :"memory")
 #define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))
 #define smp_mb() asm volatile("mfence":::"memory")
-
-#define likely(x) (x)
-#define unlikely(x) (x)
+#endif
 
 void cpu_relax_poll(void)
 {

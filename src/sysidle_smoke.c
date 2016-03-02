@@ -1,5 +1,7 @@
 // IB: added pthread
+#include "smack.h"
 #include <pthread.h>
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,9 +9,12 @@
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
-#include "fake_sat.h"
+#include <poll.h> 
+#include <unistd.h>
 
-// IB: changed to 2 CPUS (1 timing + 2 other)
+#include "fake.h"
+
+// IB: changed to 2 CPUS (1 timing + 3 other)
 #define CONFIG_NR_CPUS 2
 
 #define NR_CPUS CONFIG_NR_CPUS
@@ -105,15 +110,14 @@ void *timekeeping_cpu(void *arg)
 {
   int i;
   struct thread_arg *tap = (struct thread_arg *)arg;
-
   my_smp_processor_id = tap->me;
   while (ACCESS_ONCE(goflag)) {
     jiffies++;
-
     /* FQS scan for RCU-preempt and then RCU-sched. */
     do_fqs(&rcu_preempt_state, rcu_preempt_data_array);
     do_fqs(&rcu_sched_state, rcu_sched_data_array);
   }
+  return NULL;
 }
 
 void *other_cpu(void *arg)
@@ -140,6 +144,7 @@ void *other_cpu(void *arg)
       rcu_sysidle_exit(rdtp, 1);
       nest++;
     }
+
     poll(NULL, 0, 1);
     while (nest-- > 0) {
       rcu_sysidle_enter(rdtp, 1);
@@ -151,6 +156,7 @@ void *other_cpu(void *arg)
     /* idle exit. */
     rcu_sysidle_exit(rdtp, 0);
   }
+  return NULL;
 }
 
 int main(int argc, char *argv[])
@@ -237,13 +243,6 @@ int main(int argc, char *argv[])
     }
   }
 
-  // IB: assert added for smack, must be modified to meet number of CPUs
-  assert(((full_sysidle_state != RCU_SYSIDLE_FULL_NOTED) &&
-	  ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) != 0 &&
-	   (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) != 0)) ||
-	 ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 0 &&
-	  (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 0));
   assert(0);
-	
-printf("End of stress test.\n");
+  printf("End of stress test.\n");
 }

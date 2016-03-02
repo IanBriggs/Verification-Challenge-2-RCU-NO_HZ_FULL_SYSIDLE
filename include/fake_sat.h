@@ -37,6 +37,9 @@ typedef _Bool                   bool;
 #define false 0
 #define true  1
 
+#define likely(x) (x)
+#define unlikely(x) (x)
+
 #include "atomic_sat.h"
 
 /*
@@ -167,9 +170,6 @@ typedef _Bool                   bool;
 #else
 #define smp_mb() asm volatile("mfence":::"memory")
 #endif
-
-#define likely(x) (x)
-#define unlikely(x) (x)
 
 void cpu_relax_poll(void)
 {
