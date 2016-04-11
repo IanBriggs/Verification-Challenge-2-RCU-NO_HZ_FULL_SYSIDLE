@@ -11,10 +11,6 @@ typedef struct {
 	int counter;
 } atomic_t;
 
-#ifdef SMACK_H_
-#include "smack_atomics.h"
-#endif
-
 /*
  * Atomic operations that C can't guarantee us.  Useful for
  * resource counting etc..
@@ -54,12 +50,16 @@ static inline void atomic_set(atomic_t *v, int i)
  */
 static inline void atomic_add(int i, atomic_t *v)
 {
-#ifdef SMACK_H_
-	smack_atomic_add(v, i);
-#else
-	__sync_fetch_and_add(&v->counter, i);
-#endif
+  __VERIFIER_atomic_begin();
+  v->counter += i;
+  __VERIFIER_atomic_end();
 }
+/************************************************************/
+/* static inline void atomic_add(int i, atomic_t *v)	    */
+/* {							    */
+/* 	__sync_fetch_and_add(&v->counter, i);		    */
+/* }							    */
+/************************************************************/
 
 /**
  * atomic_sub - subtract integer from atomic variable
@@ -70,11 +70,7 @@ static inline void atomic_add(int i, atomic_t *v)
  */
 static inline void atomic_sub(int i, atomic_t *v)
 {
-#ifdef SMACK_H_
-	smack_atomic_sub(v, i);
-#else
 	atomic_add(-i, v);
-#endif
 }
 
 /**
@@ -88,13 +84,18 @@ static inline void atomic_sub(int i, atomic_t *v)
  */
 static inline int atomic_sub_and_test(int i, atomic_t *v)
 {
-#ifdef SMACK_H_
-	smack_atomic_sub(v, i);
-	return (v->counter == 0);
-#else
-	return __sync_sub_and_fetch(&v->counter, i) == 0;
-#endif
+  __VERIFIER_atomic_begin();
+  v->counter -= i;
+  int retval = (v->counter == 0);
+  __VERIFIER_atomic_end();
+  return retval;
 }
+/********************************************************************/
+/* static inline int atomic_sub_and_test(int i, atomic_t *v)	    */
+/* {								    */
+/* 	return __sync_sub_and_fetch(&v->counter, i) == 0;	    */
+/* }								    */
+/********************************************************************/
 
 /**
  * atomic_inc - increment atomic variable
@@ -128,13 +129,14 @@ static inline void atomic_dec(atomic_t *v)
  */
 static inline int atomic_dec_and_test(atomic_t *v)
 {
-#ifdef SMACK_H_
-	smack_atomic_sub(v, 1);
-        return (v->counter == 0);
-#else
-	return __sync_sub_and_fetch(&v->counter, 1) == 0;
-#endif
+  return atomic_sub_and_test(1, v);
 }
+/********************************************************************/
+/* static inline int atomic_dec_and_test(atomic_t *v)		    */
+/* {								    */
+/* 	return __sync_sub_and_fetch(&v->counter, 1) == 0;	    */
+/* }								    */
+/********************************************************************/
 
 /**
  * atomic_inc_and_test - increment and test
@@ -146,13 +148,18 @@ static inline int atomic_dec_and_test(atomic_t *v)
  */
 static inline int atomic_inc_and_test(atomic_t *v)
 {
-#ifdef SMACK_H_
-	smack_atomic_add(v, 1);
-        return (v->counter == 0);
-#else
-	return __sync_add_and_fetch(&v->counter, 1) == 0;
-#endif
+  __VERIFIER_atomic_begin();
+  v->counter += 1;
+  int retval = (v->counter == 0);
+  __VERIFIER_atomic_end();
+  return retval;
 }
+/*******************************************************/
+/* static inline int atomic_inc_and_test(atomic_t *v)  */
+/* {						       */
+/*   return __sync_add_and_fetch(&v->counter, 1) == 0; */
+/* }						       */
+/*******************************************************/
 
 /**
  * atomic_add_negative - add and test if negative
@@ -165,13 +172,18 @@ static inline int atomic_inc_and_test(atomic_t *v)
  */
 static inline int atomic_add_negative(int i, atomic_t *v)
 {
-#ifdef SMACK_H_
-	smack_atomic_add(v, i);
-        return (v->counter < 0);
-#else
-	return __sync_add_and_fetch(&v->counter, i) < 0;
-#endif
+  __VERIFIER_atomic_begin();
+  v->counter += i;
+  int retval = (v->counter < 0);
+  __VERIFIER_atomic_end();
+  return retval;
 }
+/********************************************************************/
+/* static inline int atomic_add_negative(int i, atomic_t *v)	    */
+/* {								    */
+/* 	return __sync_add_and_fetch(&v->counter, i) < 0;	    */
+/* }								    */
+/********************************************************************/
 
 /**
  * atomic_add_return - add integer and return
@@ -182,12 +194,18 @@ static inline int atomic_add_negative(int i, atomic_t *v)
  */
 static inline int atomic_add_return(int i, atomic_t *v)
 {
-#ifdef SMACK_H_
-        return i + smack_atomic_xadd(&v->counter, i);
-#else
-	return __sync_add_and_fetch(&v->counter, i);
-#endif
+  __VERIFIER_atomic_begin();
+  v->counter += i;
+  int retval = v->counter;
+  __VERIFIER_atomic_end();
+  return __sync_add_and_fetch(&v->counter, i);
 }
+/******************************************************************/
+/* static inline int atomic_add_return(int i, atomic_t *v)	  */
+/* {								  */
+/* 	return __sync_add_and_fetch(&v->counter, i);		  */
+/* }								  */
+/******************************************************************/
 
 /**
  * atomic_sub_return - subtract integer and return
@@ -206,27 +224,43 @@ static inline int atomic_sub_return(int i, atomic_t *v)
 
 static inline int atomic_cmpxchg(atomic_t *v, int old, int new)
 {
-#ifdef SMACK_H_
-        return smack_atomic_cmpxchg(&v->counter, old, new);
-#else
-	return __sync_val_compare_and_swap(&v->counter, old, new) == old;
-#endif
+  __VERIFIER_atomic_begin();
+  if (v->counter == old) {
+    v->counter = new;
+  }
+  int retval = v->counter;;
+  __VERIFIER_atomic_end();
+  return retval;
 }
+/************************************************************************************/
+/* static inline int atomic_cmpxchg(atomic_t *v, int old, int new)		    */
+/* {										    */
+/* 	return __sync_val_compare_and_swap(&v->counter, old, new) == old;	    */
+/* }										    */
+/************************************************************************************/
 
 static inline int atomic_xchg(atomic_t *v, int new)
 {
-#ifdef SMACK_H_
-        return smack_atomic_xchg(&v->counter, new);
-#else
 	int old;
 
 	for (;;) {
 		old = atomic_read(v);
-		if (__sync_val_compare_and_swap(&v->counter, old, new) == old)
+		if (atomic_cmpxchg(v, old, new) == old)
 			return old;
 	}
-#endif
 }
+/*****************************************************************************************/
+/* static inline int atomic_xchg(atomic_t *v, int new)					 */
+/* {											 */
+/* 	int old;									 */
+/* 											 */
+/* 	for (;;) {									 */
+/* 		old = atomic_read(v);							 */
+/* 		if (__sync_val_compare_and_swap(&v->counter, old, new) == old)		 */
+/* 			return old;							 */
+/* 	}										 */
+/* }											 */
+/*****************************************************************************************/
 
 /**
  * __atomic_add_unless - add unless the number is already a given value
@@ -261,13 +295,18 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
  */
 static inline short int atomic_inc_short(short int *v)
 {
-#ifdef SMACK_H_
-	smack_atomic_add_short(v, 1);
-	return *v;
-#else
-	__sync_fetch_and_add(v, 1);
-#endif
+  __VERIFIER_atomic_begin();
+  (*v) += 1;
+  short int retval = (*v);
+  __VERIFIER_atomic_end();
+  return retval;
 }
+/*****************************************************************/
+/* static inline short int atomic_inc_short(short int *v)	 */
+/* {								 */
+/* 	__sync_fetch_and_add(v, 1);				 */
+/* }								 */
+/*****************************************************************/
 
 #ifdef CONFIG_X86_64
 /**
@@ -278,32 +317,21 @@ static inline short int atomic_inc_short(short int *v)
  * Atomically ORs @v1 and @v2
  * Returns the result of the OR
  */
-static inline void atomic_or_long(unsigned long *v1, unsigned long v2)
-{
-#ifdef SMACK_H_
-        // This is unused in the main sysidle code
-        assert(0);
-#else
-	__sync_fetch_and_or(v1, v2);
-#endif
-}
+//NOT YET IMPLIMENTED
+/* static inline void atomic_or_long(unsigned long *v1, unsigned long v2) */
+/* { */
+/* 	__sync_fetch_and_or(v1, v2); */
+/* } */
 #endif
 
-#ifdef SMACK_H_
-// This is unused in the main sysidle code
-#define atomic_clear_mask(mask, addr)                           \
-        assert(0;
-
-#define atomic_set_mask(maske, addr)                            \
-        assert(0);
-#else
 /* These are x86-specific, used by some header files */
-#define atomic_clear_mask(mask, addr)				\
-	__sync_fetch_and_and(addr, mask)
+//NOT YET IMPLIMENTED
+/* #define atomic_clear_mask(mask, addr)				\ */
+/* 	__sync_fetch_and_and(addr, mask) */
 
-#define atomic_set_mask(mask, addr)				\
-	__sync_fetch_and_or(addr, mask)
-#endif
+//NOT YET IMPLIMENTED
+/* #define atomic_set_mask(mask, addr)				\ */
+/* 	__sync_fetch_and_or(addr, mask) */
 
 /* Atomic operations are already serializing on x86 */
 #define smp_mb__before_atomic_dec()	barrier()

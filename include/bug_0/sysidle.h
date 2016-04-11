@@ -34,13 +34,13 @@ static void rcu_sysidle_enter(struct rcu_dynticks *rdtp, int irq)
 		if (rdtp->dynticks_idle_nesting != 0)
 			return;  /* Still not fully idle. */
 	} else {
-		if ((rdtp->dynticks_idle_nesting & DYNTICK_TASK_NEST_MASK) ==
+	  // IB: bug idle early
+	  if (((rdtp->dynticks_idle_nesting+1) & DYNTICK_TASK_NEST_MASK) ==
 		    DYNTICK_TASK_NEST_VALUE) {
 			rdtp->dynticks_idle_nesting = 0;
 		} else {
 			rdtp->dynticks_idle_nesting -= DYNTICK_TASK_NEST_VALUE;
-			// IB: bug idle early
-			WARN_ON_ONCE(rdtp->dynticks_idle_nesting < 1);
+			WARN_ON_ONCE(rdtp->dynticks_idle_nesting < 0);
 			return;  /* Still not fully idle. */
 		}
 	}

@@ -151,15 +151,11 @@ static void rcu_sysidle_check_cpu(struct rcu_data *rdp, bool *isidle,
 	 * not the flavor of RCU that tracks sysidle state, or if this
 	 * is an offline or the timekeeping CPU, nothing to do.
 	 */
-	/**
-	   if (!*isidle || rdp->rsp != rcu_sysidle_state ||
-	   cpu_is_offline(rdp->cpu) || rdp->cpu == tick_do_timer_cpu) **/
-	// BUGGY!!!! 
 	if (!*isidle || rdp->rsp != rcu_sysidle_state ||
-	    cpu_is_offline(rdp->cpu) && rdp->cpu == tick_do_timer_cpu)
-		return;
+	    cpu_is_offline(rdp->cpu) || rdp->cpu == tick_do_timer_cpu) 
+	  return;
 	if (rcu_gp_in_progress(rdp->rsp))
-		WARN_ON_ONCE(smp_processor_id() != tick_do_timer_cpu);
+	  WARN_ON_ONCE(smp_processor_id() != tick_do_timer_cpu);
 
 	/* Pick up current idle and NMI-nesting counter and check. */
 	cur = atomic_read(&rdtp->dynticks_idle);
@@ -221,7 +217,8 @@ static unsigned long rcu_sysidle_delay(void)
 static void rcu_sysidle(unsigned long j)
 {
 	/* Check the current state. */
-	switch (ACCESS_ONCE(full_sysidle_state)) {
+  // BUG 
+	switch (ACCESS_ONCE(full_sysidle_state)+1) {
 	case RCU_SYSIDLE_NOT:
 
 		/* First time all are idle, so note a short idle period. */

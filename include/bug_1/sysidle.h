@@ -48,8 +48,9 @@ static void rcu_sysidle_enter(struct rcu_dynticks *rdtp, int irq)
 	j = jiffies;
 	ACCESS_ONCE(rdtp->dynticks_idle_jiffies) = j;
 	smp_mb__before_atomic_inc();
-	// IB: bug 
-	//atomic_inc(&rdtp->dynticks_idle);
+	// IB: bug inc twice
+	atomic_inc(&rdtp->dynticks_idle);
+	atomic_inc(&rdtp->dynticks_idle);
 	smp_mb__after_atomic_inc();
 	WARN_ON_ONCE(atomic_read(&rdtp->dynticks_idle) & 0x1);
 }

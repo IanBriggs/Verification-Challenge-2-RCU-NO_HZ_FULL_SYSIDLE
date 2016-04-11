@@ -1,0 +1,100 @@
+../src/sysidle_smoke.c, 1, 3, ../include/no_bug
+../src/sysidle_smoke.c, 1, 4, ../include/no_bug
+../src/sysidle_smoke.c, 1, 5, ../include/no_bug
+
+../src/sysidle_smoke.c, 2, 3, ../include/no_bug
+../src/sysidle_smoke.c, 2, 4, ../include/no_bug
+../src/sysidle_smoke.c, 2, 5, ../include/no_bug
+
+
+../src/sysidle_sat_smoke.c, 1, 3, ../include/no_bug
+../src/sysidle_sat_smoke.c, 1, 4, ../include/no_bug
+../src/sysidle_sat_smoke.c, 1, 5, ../include/no_bug
+
+../src/sysidle_sat_smoke.c, 2, 3, ../include/no_bug
+../src/sysidle_sat_smoke.c, 2, 4, ../include/no_bug
+../src/sysidle_sat_smoke.c, 2, 5, ../include/no_bug
+
+
+
+
+../src/sysidle.c, 1, 3, ../include/bug_0
+../src/sysidle.c, 1, 4, ../include/bug_0
+../src/sysidle.c, 1, 5, ../include/bug_0
+
+../src/sysidle.c, 2, 3, ../include/bug_0
+../src/sysidle.c, 2, 4, ../include/bug_0
+../src/sysidle.c, 2, 5, ../include/bug_0
+
+
+../src/sysidle_sat.c, 1, 3, ../include/bug_0
+../src/sysidle_sat.c, 1, 4, ../include/bug_0
+../src/sysidle_sat.c, 1, 5, ../include/bug_0
+
+../src/sysidle_sat.c, 2, 3, ../include/bug_0
+../src/sysidle_sat.c, 2, 4, ../include/bug_0
+../src/sysidle_sat.c, 2, 5, ../include/bug_0
+
+
+
+
+../src/sysidle.c, 1, 3, ../include/bug_1
+../src/sysidle.c, 1, 4, ../include/bug_1
+../src/sysidle.c, 1, 5, ../include/bug_1
+
+../src/sysidle.c, 2, 3, ../include/bug_1
+../src/sysidle.c, 2, 4, ../include/bug_1
+../src/sysidle.c, 2, 5, ../include/bug_1
+
+
+../src/sysidle_sat.c, 1, 3, ../include/bug_1
+../src/sysidle_sat.c, 1, 4, ../include/bug_1
+../src/sysidle_sat.c, 1, 5, ../include/bug_1
+
+../src/sysidle_sat.c, 2, 3, ../include/bug_1
+../src/sysidle_sat.c, 2, 4, ../include/bug_1
+../src/sysidle_sat.c, 2, 5, ../include/bug_1
+
+
+
+
+../src/sysidle.c, 1, 3, ../include/bug_2
+../src/sysidle.c, 1, 4, ../include/bug_2
+../src/sysidle.c, 1, 5, ../include/bug_2
+
+../src/sysidle.c, 2, 3, ../include/bug_2
+../src/sysidle.c, 2, 4, ../include/bug_2
+../src/sysidle.c, 2, 5, ../include/bug_2
+
+
+../src/sysidle_sat.c, 1, 3, ../include/bug_2
+../src/sysidle_sat.c, 1, 4, ../include/bug_2
+../src/sysidle_sat.c, 1, 5, ../include/bug_2
+
+../src/sysidle_sat.c, 2, 3, ../include/bug_2
+../src/sysidle_sat.c, 2, 4, ../include/bug_2
+../src/sysidle_sat.c, 2, 5, ../include/bug_2
+
+
+
+
+../src/sysidle.c, 1, 3, ../include/no_bug
+../src/sysidle.c, 1, 4, ../include/no_bug
+../src/sysidle.c, 1, 5, ../include/no_bug
+
+../src/sysidle.c, 2, 3, ../include/no_bug
+../src/sysidle.c, 2, 4, ../include/no_bug
+../src/sysidle.c, 2, 5, ../include/no_bug
+
+
+../src/sysidle_sat.c, 1, 3, ../include/no_bug
+../src/sysidle_sat.c, 1, 4, ../include/no_bug
+../src/sysidle_sat.c, 1, 5, ../include/no_bug
+
+../src/sysidle_sat.c, 2, 3, ../include/no_bug
+../src/sysidle_sat.c, 2, 4, ../include/no_bug
+../src/sysidle_sat.c, 2, 5, ../include/no_bug
+
+
+
+

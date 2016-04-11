@@ -4,7 +4,7 @@
 #
 
 base_include=None
-command="smack --time-limit=86400 --pthread --context-bound={k} --unroll={n} --loop-limit={n} --clang-options=\"-I{include} -I{extra_include}\" {file}"
+command="smack -x svcomp --verifier=corral --time-limit=604800 --pthread --context-bound={k} --unroll={n} --loop-limit={n} --clang-options=\"-I{include} -I{extra_include}\" {file}"
 
 import multiprocessing as MP
 import subprocess as SP
