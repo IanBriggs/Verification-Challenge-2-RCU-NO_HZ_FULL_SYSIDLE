@@ -1,11 +1,11 @@
 #ifndef _ASM_X86_ATOMIC_H
 #define _ASM_X86_ATOMIC_H
 
-// #include <linux/compiler.h>
-// #include <linux/types.h>
-// #include <asm/processor.h>
-// #include <asm/alternative.h>
-// #include <asm/cmpxchg.h>
+/* #include <linux/compiler.h> */
+/* #include <linux/types.h> */
+/* #include <asm/processor.h> */
+/* #include <asm/alternative.h> */
+/* #include <asm/cmpxchg.h> */
 
 typedef struct {
 	int counter;
@@ -16,7 +16,7 @@ typedef struct {
  * resource counting etc..
  */
 
-#define ATOMIC_INIT(i)	{ (i) }
+/* UNUSED #define ATOMIC_INIT(i)	{ (i) } */
 
 /**
  * atomic_read - read atomic variable
@@ -48,18 +48,10 @@ static inline void atomic_set(atomic_t *v, int i)
  *
  * Atomically adds @i to @v.
  */
-static inline void atomic_add(int i, atomic_t *v)
-{
-  __VERIFIER_atomic_begin();
-  v->counter += i;
-  __VERIFIER_atomic_end();
-}
-/************************************************************/
-/* static inline void atomic_add(int i, atomic_t *v)	    */
-/* {							    */
-/* 	__sync_fetch_and_add(&v->counter, i);		    */
-/* }							    */
-/************************************************************/
+/* UNUSED static inline void atomic_add(int i, atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	__sync_fetch_and_add(&v->counter, i); */
+/* UNUSED } */
 
 /**
  * atomic_sub - subtract integer from atomic variable
@@ -68,10 +60,10 @@ static inline void atomic_add(int i, atomic_t *v)
  *
  * Atomically subtracts @i from @v.
  */
-static inline void atomic_sub(int i, atomic_t *v)
-{
-	atomic_add(-i, v);
-}
+/* UNUSED static inline void atomic_sub(int i, atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	atomic_add(-i, v); */
+/* UNUSED } */
 
 /**
  * atomic_sub_and_test - subtract value from variable and test result
@@ -82,20 +74,10 @@ static inline void atomic_sub(int i, atomic_t *v)
  * true if the result is zero, or false for all
  * other cases.
  */
-static inline int atomic_sub_and_test(int i, atomic_t *v)
-{
-  __VERIFIER_atomic_begin();
-  v->counter -= i;
-  int retval = (v->counter == 0);
-  __VERIFIER_atomic_end();
-  return retval;
-}
-/********************************************************************/
-/* static inline int atomic_sub_and_test(int i, atomic_t *v)	    */
-/* {								    */
-/* 	return __sync_sub_and_fetch(&v->counter, i) == 0;	    */
-/* }								    */
-/********************************************************************/
+/* UNUSED static inline int atomic_sub_and_test(int i, atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	return __sync_sub_and_fetch(&v->counter, i) == 0; */
+/* UNUSED } */
 
 /**
  * atomic_inc - increment atomic variable
@@ -105,8 +87,16 @@ static inline int atomic_sub_and_test(int i, atomic_t *v)
  */
 static inline void atomic_inc(atomic_t *v)
 {
-	atomic_add(1, v);
+  __VERIFIER_atomic_begin();
+  v->counter++;
+  __VERIFIER_atomic_end();
 }
+/*****************************************************/
+/* static inline void atomic_inc(atomic_t *v)	     */
+/* {						     */
+/* 	atomic_add(1, v);			     */
+/* }						     */
+/*****************************************************/
 
 /**
  * atomic_dec - decrement atomic variable
@@ -114,10 +104,10 @@ static inline void atomic_inc(atomic_t *v)
  *
  * Atomically decrements @v by 1.
  */
-static inline void atomic_dec(atomic_t *v)
-{
-	atomic_sub(1, v);
-}
+/* UNUSED static inline void atomic_dec(atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	atomic_sub(1, v); */
+/* UNUSED } */
 
 /**
  * atomic_dec_and_test - decrement and test
@@ -127,16 +117,10 @@ static inline void atomic_dec(atomic_t *v)
  * returns true if the result is 0, or false for all other
  * cases.
  */
-static inline int atomic_dec_and_test(atomic_t *v)
-{
-  return atomic_sub_and_test(1, v);
-}
-/********************************************************************/
-/* static inline int atomic_dec_and_test(atomic_t *v)		    */
-/* {								    */
-/* 	return __sync_sub_and_fetch(&v->counter, 1) == 0;	    */
-/* }								    */
-/********************************************************************/
+/* UNUSED static inline int atomic_dec_and_test(atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	return __sync_sub_and_fetch(&v->counter, 1) == 0; */
+/* UNUSED } */
 
 /**
  * atomic_inc_and_test - increment and test
@@ -146,20 +130,10 @@ static inline int atomic_dec_and_test(atomic_t *v)
  * and returns true if the result is zero, or false for all
  * other cases.
  */
-static inline int atomic_inc_and_test(atomic_t *v)
-{
-  __VERIFIER_atomic_begin();
-  v->counter += 1;
-  int retval = (v->counter == 0);
-  __VERIFIER_atomic_end();
-  return retval;
-}
-/*******************************************************/
-/* static inline int atomic_inc_and_test(atomic_t *v)  */
-/* {						       */
-/*   return __sync_add_and_fetch(&v->counter, 1) == 0; */
-/* }						       */
-/*******************************************************/
+/* UNUSED static inline int atomic_inc_and_test(atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	return __sync_add_and_fetch(&v->counter, 1) == 0; */
+/* UNUSED } */
 
 /**
  * atomic_add_negative - add and test if negative
@@ -170,20 +144,10 @@ static inline int atomic_inc_and_test(atomic_t *v)
  * if the result is negative, or false when
  * result is greater than or equal to zero.
  */
-static inline int atomic_add_negative(int i, atomic_t *v)
-{
-  __VERIFIER_atomic_begin();
-  v->counter += i;
-  int retval = (v->counter < 0);
-  __VERIFIER_atomic_end();
-  return retval;
-}
-/********************************************************************/
-/* static inline int atomic_add_negative(int i, atomic_t *v)	    */
-/* {								    */
-/* 	return __sync_add_and_fetch(&v->counter, i) < 0;	    */
-/* }								    */
-/********************************************************************/
+/* UNUSED static inline int atomic_add_negative(int i, atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	return __sync_add_and_fetch(&v->counter, i) < 0; */
+/* UNUSED } */
 
 /**
  * atomic_add_return - add integer and return
@@ -192,20 +156,10 @@ static inline int atomic_add_negative(int i, atomic_t *v)
  *
  * Atomically adds @i to @v and returns @i + @v
  */
-static inline int atomic_add_return(int i, atomic_t *v)
-{
-  __VERIFIER_atomic_begin();
-  v->counter += i;
-  int retval = v->counter;
-  __VERIFIER_atomic_end();
-  return __sync_add_and_fetch(&v->counter, i);
-}
-/******************************************************************/
-/* static inline int atomic_add_return(int i, atomic_t *v)	  */
-/* {								  */
-/* 	return __sync_add_and_fetch(&v->counter, i);		  */
-/* }								  */
-/******************************************************************/
+/* UNUSED static inline int atomic_add_return(int i, atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	return __sync_add_and_fetch(&v->counter, i); */
+/* UNUSED } */
 
 /**
  * atomic_sub_return - subtract integer and return
@@ -214,53 +168,31 @@ static inline int atomic_add_return(int i, atomic_t *v)
  *
  * Atomically subtracts @i from @v and returns @v - @i
  */
-static inline int atomic_sub_return(int i, atomic_t *v)
-{
-	return atomic_add_return(-i, v);
-}
+/* UNUSED static inline int atomic_sub_return(int i, atomic_t *v) */
+/* UNUSED { */
+/* UNUSED 	return atomic_add_return(-i, v); */
+/* UNUSED } */
 
-#define atomic_inc_return(v)  (atomic_add_return(1, v))
-#define atomic_dec_return(v)  (atomic_sub_return(1, v))
+/* UNUSED #define atomic_inc_return(v)  (atomic_add_return(1, v)) */
+/* UNUSED #define atomic_dec_return(v)  (atomic_sub_return(1, v)) */
 
-static inline int atomic_cmpxchg(atomic_t *v, int old, int new)
-{
-  __VERIFIER_atomic_begin();
-  if (v->counter == old) {
-    v->counter = new;
-  }
-  int retval = v->counter;;
-  __VERIFIER_atomic_end();
-  return retval;
-}
-/************************************************************************************/
-/* static inline int atomic_cmpxchg(atomic_t *v, int old, int new)		    */
-/* {										    */
-/* 	return __sync_val_compare_and_swap(&v->counter, old, new) == old;	    */
-/* }										    */
-/************************************************************************************/
 
-static inline int atomic_xchg(atomic_t *v, int new)
-{
-	int old;
+/* UNUSED static inline int atomic_cmpxchg(atomic_t *v, int old, int new) */
+/* UNUSED { */
+/* UNUSED 	return __sync_val_compare_and_swap(&v->counter, old, new) == old; */
+/* UNUSED } */
 
-	for (;;) {
-		old = atomic_read(v);
-		if (atomic_cmpxchg(v, old, new) == old)
-			return old;
-	}
-}
-/*****************************************************************************************/
-/* static inline int atomic_xchg(atomic_t *v, int new)					 */
-/* {											 */
-/* 	int old;									 */
-/* 											 */
-/* 	for (;;) {									 */
-/* 		old = atomic_read(v);							 */
-/* 		if (__sync_val_compare_and_swap(&v->counter, old, new) == old)		 */
-/* 			return old;							 */
-/* 	}										 */
-/* }											 */
-/*****************************************************************************************/
+
+/* UNUSED static inline int atomic_xchg(atomic_t *v, int new) */
+/* UNUSED { */
+/* UNUSED 	int old; */
+/* UNUSED 	for (;;) { */
+/* UNUSED 		old = atomic_read(v); */
+/* UNUSED 		if (__sync_val_compare_and_swap(&v->counter, old, new) == old) */
+/* UNUSED 			return old; */
+/* UNUSED 	} */
+/* UNUSED } */
+
 
 /**
  * __atomic_add_unless - add unless the number is already a given value
@@ -271,20 +203,20 @@ static inline int atomic_xchg(atomic_t *v, int new)
  * Atomically adds @a to @v, so long as @v was not already @u.
  * Returns the old value of @v.
  */
-static inline int __atomic_add_unless(atomic_t *v, int a, int u)
-{
-	int c, old;
-	c = atomic_read(v);
-	for (;;) {
-		if (c == (u))
-			break;
-		old = atomic_cmpxchg((v), c, c + (a));
-		if (old == c)
-			break;
-		c = old;
-	}
-	return c;
-}
+/* UNUSED static inline int __atomic_add_unless(atomic_t *v, int a, int u) */
+/* UNUSED { */
+/* UNUSED 	int c, old; */
+/* UNUSED 	c = atomic_read(v); */
+/* UNUSED 	for (;;) { */
+/* UNUSED 		if (c == (u)) */
+/* UNUSED 			break; */
+/* UNUSED 		old = atomic_cmpxchg((v), c, c + (a)); */
+/* UNUSED 		if (old == c) */
+/* UNUSED 			break; */
+/* UNUSED 		c = old; */
+/* UNUSED 	} */
+/* UNUSED 	return c; */
+/* UNUSED } */
 
 /**
  * atomic_inc_short - increment of a short integer
@@ -293,20 +225,10 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
  * Atomically adds 1 to @v
  * Returns the new value of @u
  */
-static inline short int atomic_inc_short(short int *v)
-{
-  __VERIFIER_atomic_begin();
-  (*v) += 1;
-  short int retval = (*v);
-  __VERIFIER_atomic_end();
-  return retval;
-}
-/*****************************************************************/
-/* static inline short int atomic_inc_short(short int *v)	 */
-/* {								 */
-/* 	__sync_fetch_and_add(v, 1);				 */
-/* }								 */
-/*****************************************************************/
+/* UNUSED static inline short int atomic_inc_short(short int *v) */
+/* UNUSED { */
+/* UNUSED 	__sync_fetch_and_add(v, 1); */
+/* UNUSED } */
 
 #ifdef CONFIG_X86_64
 /**
@@ -317,32 +239,29 @@ static inline short int atomic_inc_short(short int *v)
  * Atomically ORs @v1 and @v2
  * Returns the result of the OR
  */
-//NOT YET IMPLIMENTED
-/* static inline void atomic_or_long(unsigned long *v1, unsigned long v2) */
-/* { */
-/* 	__sync_fetch_and_or(v1, v2); */
-/* } */
+/* UNUSED static inline void atomic_or_long(unsigned long *v1, unsigned long v2) */
+/* UNUSED { */
+/* UNUSED 	__sync_fetch_and_or(v1, v2); */
+/* UNUSED } */
 #endif
 
 /* These are x86-specific, used by some header files */
-//NOT YET IMPLIMENTED
-/* #define atomic_clear_mask(mask, addr)				\ */
-/* 	__sync_fetch_and_and(addr, mask) */
+/* UNUSED #define atomic_clear_mask(mask, addr)				\ */
+/* UNUSED 	__sync_fetch_and_and(addr, mask) */
 
-//NOT YET IMPLIMENTED
-/* #define atomic_set_mask(mask, addr)				\ */
-/* 	__sync_fetch_and_or(addr, mask) */
+/* UNUSED #define atomic_set_mask(mask, addr)				\ */
+/* UNUSED 	__sync_fetch_and_or(addr, mask) */
 
 /* Atomic operations are already serializing on x86 */
-#define smp_mb__before_atomic_dec()	barrier()
-#define smp_mb__after_atomic_dec()	barrier()
+/* UNUSED #define smp_mb__before_atomic_dec()	barrier() */
+/* UNUSED #define smp_mb__after_atomic_dec()	barrier() */
 #define smp_mb__before_atomic_inc()	barrier()
 #define smp_mb__after_atomic_inc()	barrier()
 
-// #ifdef CONFIG_X86_32
-// # include <asm/atomic64_32.h>
-// #else
-// # include <asm/atomic64_64.h>
-// #endif
+/* #ifdef CONFIG_X86_32 */
+/* # include <asm/atomic64_32.h> */
+/* #else */
+/* # include <asm/atomic64_64.h> */
+/* #endif */
 
 #endif /* _ASM_X86_ATOMIC_H */
