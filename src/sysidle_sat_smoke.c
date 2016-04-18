@@ -102,7 +102,7 @@ void *timekeeping_cpu(void *arg)
 	int i;
 	struct thread_arg *tap = (struct thread_arg *)arg;
 
-	my_smp_processor_id = tap->me;
+	//	my_smp_processor_id = tap->me;
 	for (i = 0; i < ITER; i++) {
 		jiffies++;
 
@@ -123,7 +123,7 @@ void *other_cpu(void *arg)
 	struct rcu_dynticks *rdtp;
 	struct thread_arg *tap = (struct thread_arg *)arg;
 
-	my_smp_processor_id = tap->me;
+	//	my_smp_processor_id = tap->me;
 	rdtp = &rcu_dynticks_array[tap->me];
 	for (i = 0; i < ITER; i++) {
 		/* busy period. */
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 
 	/* Stress test. */
 	printf("Start stress test.\n");
-	pthread_create(&tids[0], NULL, timekeeping_cpu, &ta_array[0]);
+	tick_do_timer_cpu = pthread_create(&tids[0], NULL, timekeeping_cpu, &ta_array[0]);
 	for (i = 1; i < nthreads; i++) {
 		pthread_create(&tids[i], NULL, other_cpu, &ta_array[i]);
 	}
