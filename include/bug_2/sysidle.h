@@ -128,7 +128,8 @@ static void rcu_sysidle_exit(struct rcu_dynticks *rdtp, int irq)
 	 * invoke rcu_sysidle_force_exit() directly if it does anything
 	 * more than take a scheduling-clock interrupt.
 	 */
-	if (smp_processor_id() == tick_do_timer_cpu)
+	//	if (smp_processor_id() == tick_do_timer_cpu)
+	if (pthread_equals(smp_processor_id(), tick_do_timer_cpu))
 		return;
 
 	/* Update system-idle state: We are clearly no longer fully idle! */
@@ -155,7 +156,8 @@ static void rcu_sysidle_check_cpu(struct rcu_data *rdp, bool *isidle,
 	    cpu_is_offline(rdp->cpu) || rdp->cpu == tick_do_timer_cpu) 
 	  return;
 	if (rcu_gp_in_progress(rdp->rsp))
-	  WARN_ON_ONCE(smp_processor_id() != tick_do_timer_cpu);
+	  WARN_ON_ONCE(!pthread_equals(smp_processor_id(), tick_do_timer_cpu));
+	//	  WARN_ON_ONCE(smp_processor_id() != tick_do_timer_cpu);
 
 	/* Pick up current idle and NMI-nesting counter and check. */
 	cur = atomic_read(&rdtp->dynticks_idle);

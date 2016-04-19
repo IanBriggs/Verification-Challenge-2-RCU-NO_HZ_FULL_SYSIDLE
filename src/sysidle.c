@@ -36,11 +36,12 @@ struct rcu_data *rcu_sched_data_array;
 
 struct rcu_dynticks *rcu_dynticks_array;
 
-int tick_do_timer_cpu;
+pthread_t tick_do_timer_cpu;
 
-void rcu_kick_nohz_cpu(int cpu)
+//void rcu_kick_nohz_cpu(int cpu)
+void rcu_kick_nohz_cpu(pthread_t cpu)
 {
-	printf("Informed CPU %d of end of full-system idle.\n", cpu);
+  //printf("Informed CPU %d of end of full-system idle.\n", cpu);
 }
 
 static int rcu_gp_in_progress(struct rcu_state *rsp)
@@ -105,7 +106,7 @@ void *timekeeping_cpu(void *arg)
 	int i;
 	struct thread_arg *tap = (struct thread_arg *)arg;
 
-	tick_do_timer_cpu = (int) pthread_self();
+	tick_do_timer_cpu = pthread_self();
 	//	my_smp_processor_id = tap->me;
 	while (ACCESS_ONCE(goflag)) {
 		jiffies++;
