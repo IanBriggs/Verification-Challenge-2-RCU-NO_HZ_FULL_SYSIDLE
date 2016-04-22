@@ -206,8 +206,8 @@ int main(int argc, char *argv[])
 
 	/* Should fail */
 	if (full_sysidle_state == RCU_SYSIDLE_FULL_NOTED ||
-	    (atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle) & 0x1) == 1 ||
-	    (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle) & 0x1) == 1) {
+	    (atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle)) == 1 ||
+	    (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle)) == 1) {
 	  __VERIFIER_error();
 	}
 
