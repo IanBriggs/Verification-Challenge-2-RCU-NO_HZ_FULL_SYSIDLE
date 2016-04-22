@@ -14,7 +14,7 @@ extern void __VERIFIER_atomic_end();
 
 int __unbuffered_cnt = 0;
 
-#define ITER 3
+#define ITER 2
 
 #define CONFIG_NR_CPUS 3
 #define NR_CPUS CONFIG_NR_CPUS
