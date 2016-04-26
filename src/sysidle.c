@@ -244,9 +244,11 @@ int main(int argc, char *argv[])
 	}
 	printf("End of stress test.\n");
 
-	if (!(full_sysidle_state != RCU_SYSIDLE_FULL_NOTED ||
-	      ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle)) == 0 &&
-	       (atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle)) == 0))) {
+	int is_idle = (full_sysidle_state == RCU_SYSIDLE_FULL_NOTED);
+	int worker_1_idle = ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle)) == 0);
+	int worker_2_idle = ((atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle)) == 0);
+
+	if (is_idle && (!worker_1_idle || !worker_2_idle)) {
 	  __VERIFIER_error();
 	}
 
