@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 	int worker_1_idle = ((atomic_read(&rcu_preempt_data_array[1].dynticks->dynticks_idle)) == 1);
 	int worker_2_idle = ((atomic_read(&rcu_preempt_data_array[2].dynticks->dynticks_idle)) == 1);
 
-	if (!id_idle && (worker_1_idle || worker_2_idle)) {
+	if (!is_idle && (worker_1_idle || worker_2_idle)) {
 	  __VERIFIER_error();
 	}
 
